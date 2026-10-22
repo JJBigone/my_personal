@@ -7,12 +7,14 @@ export const Footer: React.FC = () => {
     <footer className="mt-24 border-t border-[#D9C8AA]/40 bg-[#F3EBDD]/40 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#355746] text-[#FAF8F2] flex items-center justify-center font-bold text-sm">
-              M
-            </div>
+          <div className="flex items-center gap-2.5">
+            <img 
+              src="/logo.png" 
+              alt="Pacharaphum Profile Logo" 
+              className="w-8 h-8 rounded-full object-cover border border-[#D9C8AA]/50 shadow-xs" 
+            />
             <span className="font-semibold text-base text-[#243D32]">
-              Studio<span className="text-[#82977B]">.Liquid</span>
+              Pacharaphum <span className="text-[#82977B]">Profile</span>
             </span>
           </div>
           <p className="text-xs text-[#746F64] mt-2 max-w-sm">

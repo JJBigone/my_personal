@@ -133,14 +133,21 @@ export const AdminLoginPage: React.FC = () => {
         </button>
 
         <div className="text-center space-y-2 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-[#355746] text-[#FAF8F2] flex items-center justify-center mx-auto shadow-md">
-            <Lock className="w-7 h-7" />
+          <div className="relative w-16 h-16 mx-auto mb-2">
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-16 h-16 rounded-full object-cover border-2 border-[#D9C8AA] shadow-md mx-auto" 
+            />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#355746] text-[#FAF8F2] flex items-center justify-center shadow">
+              <Lock className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-[#243D32]">Admin Access</h1>
+          <h1 className="text-2xl font-bold text-[#243D32]">Pacharaphum</h1>
           <p className="text-xs text-[#746F64]">
             {useEmailAuth
               ? 'Sign in with your administrator email & password'
-              : 'Enter your 4-digit security PIN to unlock'}
+              : 'Enter 4-digit security PIN to unlock'}
           </p>
         </div>
 

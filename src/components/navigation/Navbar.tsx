@@ -28,13 +28,15 @@ export const Navbar: React.FC = () => {
         {/* Brand / Logo */}
         <Link 
           to="/" 
-          className="flex items-center gap-2 group text-decoration-none"
+          className="flex items-center gap-2.5 group text-decoration-none"
         >
-          <div className="w-9 h-9 rounded-full bg-[#355746] text-[#FAF8F2] flex items-center justify-center font-bold text-lg shadow-sm transition-transform duration-300 group-hover:scale-105">
-            M
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="Pacharaphum Profile Logo" 
+            className="w-9 h-9 rounded-full object-cover shadow-sm transition-transform duration-300 group-hover:scale-105 border border-[#D9C8AA]/50" 
+          />
           <span className="font-semibold text-lg tracking-tight text-[#243D32]">
-            Studio<span className="text-[#82977B]">.Liquid</span>
+            Pacharaphum <span className="text-[#82977B]">Profile</span>
           </span>
         </Link>
 

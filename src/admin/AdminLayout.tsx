@@ -51,11 +51,16 @@ export const AdminLayout: React.FC = () => {
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <Link to="/admin" className="flex items-center gap-2 font-bold text-lg text-[#243D32]">
-              <div className="w-8 h-8 rounded-lg bg-[#355746] text-[#FAF8F2] flex items-center justify-center text-sm">
-                A
+            <Link to="/admin" className="flex items-center gap-2.5 font-bold text-lg text-[#243D32]">
+              <img 
+                src="/logo.png" 
+                alt="Logo" 
+                className="w-8 h-8 rounded-full object-cover border border-[#D9C8AA]/50 shadow-xs" 
+              />
+              <div>
+                <span className="text-sm font-bold block leading-tight">Pacharaphum</span>
+                <span className="text-[10px] text-[#82977B] font-semibold uppercase tracking-wider block">Admin Center</span>
               </div>
-              <span>Admin Center</span>
             </Link>
           </div>
 
