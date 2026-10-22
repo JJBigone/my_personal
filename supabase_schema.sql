@@ -155,20 +155,26 @@ CREATE POLICY "Admins can read admin_users"
 
 
 -- =========================================================================
--- STORAGE BUCKETS SETUP (portfolio-media)
+-- OPTION: PIN AUTHENTICATION MODE (สำหรับผู้ใช้ที่ต้องการใช้ PIN 4 หลัก)
+-- รันโค้ดด้านล่างนี้ใน Supabase SQL Editor หากต้องการให้หน้า Admin ที่ใช้ PIN
+-- สามารถบันทึกโปรเจกต์และอัปโหลดรูปภาพเข้า Supabase ได้โดยไม่ต้องสมัครบัญชีอีเมล
 -- =========================================================================
--- Run this to create storage bucket in Supabase dashboard or SQL:
--- INSERT INTO storage.buckets (id, name, public) VALUES ('portfolio-media', 'portfolio-media', true);
+/*
+DROP POLICY IF EXISTS "Admins can view all projects" ON public.projects;
+DROP POLICY IF EXISTS "Admins can insert projects" ON public.projects;
+DROP POLICY IF EXISTS "Admins can update projects" ON public.projects;
+DROP POLICY IF EXISTS "Admins can delete projects" ON public.projects;
+DROP POLICY IF EXISTS "Public can view published projects" ON public.projects;
 
--- Storage RLS:
--- 1. Anyone can view images from portfolio-media
--- CREATE POLICY "Public can view portfolio media" ON storage.objects
---   FOR SELECT USING (bucket_id = 'portfolio-media');
+CREATE POLICY "Allow all projects operations" ON public.projects FOR ALL USING (true) WITH CHECK (true);
 
--- 2. Only admins can upload/update/delete media
--- CREATE POLICY "Admins can upload portfolio media" ON storage.objects
---   FOR INSERT TO authenticated WITH CHECK (bucket_id = 'portfolio-media' AND public.is_admin());
--- CREATE POLICY "Admins can update portfolio media" ON storage.objects
---   FOR UPDATE TO authenticated USING (bucket_id = 'portfolio-media' AND public.is_admin());
--- CREATE POLICY "Admins can delete portfolio media" ON storage.objects
---   FOR DELETE TO authenticated USING (bucket_id = 'portfolio-media' AND public.is_admin());
+DROP POLICY IF EXISTS "Only admins can view contact messages" ON public.contact_messages;
+DROP POLICY IF EXISTS "Only admins can update contact messages" ON public.contact_messages;
+DROP POLICY IF EXISTS "Only admins can delete contact messages" ON public.contact_messages;
+CREATE POLICY "Allow all contact messages operations" ON public.contact_messages FOR ALL USING (true) WITH CHECK (true);
+
+INSERT INTO storage.buckets (id, name, public) VALUES ('portfolio-media', 'portfolio-media', true) ON CONFLICT (id) DO NOTHING;
+DROP POLICY IF EXISTS "Allow portfolio media operations" ON storage.objects;
+CREATE POLICY "Allow portfolio media operations" ON storage.objects FOR ALL USING (bucket_id = 'portfolio-media') WITH CHECK (bucket_id = 'portfolio-media');
+*/
+

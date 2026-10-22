@@ -8,8 +8,11 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithPin: (pin: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
+
+const PIN_STORAGE_KEY = 'portfolio_admin_pin_authenticated';
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -17,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   loading: true,
   signIn: async () => ({ error: null }),
+  signInWithPin: async () => ({ error: null }),
   signOut: async () => {},
 });
 
@@ -28,6 +32,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Check admin status from database table or session
   const checkAdminStatus = async (currentUser: User | null) => {
+    // Check local PIN authentication first
+    if (localStorage.getItem(PIN_STORAGE_KEY) === 'true') {
+      setIsAdmin(true);
+      if (!currentUser) {
+        setUser({ id: 'pin-admin', email: 'Admin' } as unknown as User);
+      }
+      return;
+    }
+
     if (!currentUser) {
       setIsAdmin(false);
       return;
@@ -60,15 +73,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    const isPinAuth = localStorage.getItem(PIN_STORAGE_KEY) === 'true';
+    if (isPinAuth) {
+      setIsAdmin(true);
+      setUser({ id: 'pin-admin', email: 'Admin' } as unknown as User);
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        setUser(session.user);
+      }
       checkAdminStatus(session?.user ?? null).finally(() => setLoading(false));
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        setUser(session.user);
+      }
       checkAdminStatus(session?.user ?? null).finally(() => setLoading(false));
     });
 
@@ -80,15 +103,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error: error ? new Error(error.message) : null };
   };
 
+  const signInWithPin = async (pin: string) => {
+    const targetPin = (import.meta.env.VITE_ADMIN_PIN || '1234').toString().trim();
+    if (pin.trim() === targetPin) {
+      localStorage.setItem(PIN_STORAGE_KEY, 'true');
+      setIsAdmin(true);
+      setUser({ id: 'pin-admin', email: 'Admin' } as unknown as User);
+      return { error: null };
+    }
+    return { error: new Error('Incorrect 4-digit PIN. Please try again.') };
+  };
+
   const signOut = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem(PIN_STORAGE_KEY);
+    await supabase.auth.signOut().catch(() => {});
     setUser(null);
     setSession(null);
     setIsAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signInWithPin, signOut }}>
       {children}
     </AuthContext.Provider>
   );
