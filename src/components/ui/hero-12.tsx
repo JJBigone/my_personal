@@ -10,8 +10,10 @@ import { Cta, type CtaProps } from "@/components/ui/hero-12-utils/cta";
 
 export interface Hero12Props {
   title: string;
+  titleNode?: React.ReactNode;
   established?: string;
   description: string;
+  descriptionNode?: React.ReactNode;
   backgroundImage: string;
   backgroundAlt?: string;
   animation?: "none" | "subtle";
@@ -38,12 +40,12 @@ const variantStyles = {
     copy: "gap-4 sm:gap-5",
   },
   fullscreen: {
-    section: "min-h-screen min-h-[100dvh]",
-    padding: "px-6 pb-16 pt-32 sm:px-12 sm:pb-20 sm:pt-36 md:px-16 md:pb-24",
+    section: "min-h-screen min-h-[100dvh] pb-14 sm:pb-16 md:pb-20 pt-24",
+    padding: "px-6 sm:px-12 md:px-16",
     title: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl",
     established: "text-xs sm:text-sm",
-    description: "max-w-xl text-sm sm:text-base md:text-lg",
-    copy: "gap-5 sm:gap-6",
+    description: "max-w-2xl sm:max-w-3xl text-base sm:text-lg md:text-xl",
+    copy: "gap-1 sm:gap-1.5",
   },
 } as const;
 
@@ -93,8 +95,10 @@ function Reveal({
 
 export function Hero12({
   title,
+  titleNode,
   established,
   description,
+  descriptionNode,
   backgroundImage,
   backgroundAlt = "",
   animation = "none",
@@ -122,7 +126,21 @@ export function Hero12({
     </div>
   );
 
-  const titleElement = title && (
+  const titleElement = titleNode ? (
+    <div className="w-full">
+      {titleNode}
+      {established && (
+        <span
+          className={cn(
+            "font-semibold tracking-widest text-white/80 uppercase drop-shadow-sm mt-1 inline-block",
+            vs.established,
+          )}
+        >
+          {established}
+        </span>
+      )}
+    </div>
+  ) : title ? (
     <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
       <h1 className={cn("font-medium tracking-tight text-white drop-shadow-md", vs.title)}>
         <Balancer>{title}</Balancer>
@@ -138,13 +156,17 @@ export function Hero12({
         </span>
       )}
     </div>
-  );
+  ) : null;
 
-  const descriptionElement = description && (
+  const descriptionElement = descriptionNode ? (
+    <div className={cn("leading-relaxed text-white/90 drop-shadow-sm font-normal", vs.description)}>
+      {descriptionNode}
+    </div>
+  ) : description ? (
     <p className={cn("leading-relaxed text-white/90 drop-shadow-sm font-normal", vs.description)}>
       <Balancer>{description}</Balancer>
     </p>
-  );
+  ) : null;
 
   const copyElement = (
     <div className={cn("flex flex-col", vs.copy)}>
@@ -169,7 +191,7 @@ export function Hero12({
 
       <motion.div
         className={cn(
-          "relative z-10 flex w-full flex-col gap-6 sm:flex-row sm:items-end sm:justify-between max-w-7xl mx-auto",
+          "relative z-10 flex w-full flex-col gap-6 sm:flex-row sm:items-end sm:justify-between max-w-7xl mx-auto w-full",
           vs.padding,
         )}
         variants={animate ? container : undefined}
@@ -177,7 +199,7 @@ export function Hero12({
         whileInView={animate ? "visible" : undefined}
         viewport={{ once: true, margin: "-80px" }}
       >
-        <Reveal active={animate} className="min-w-0">
+        <Reveal active={animate} className="flex-1 min-w-0">
           {copyElement}
         </Reveal>
 

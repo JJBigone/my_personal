@@ -1,0 +1,122 @@
+.specular-button {
+  --sb-radius: 24px;
+  --sb-tint: #243D32;
+  --sb-tint-opacity: 0.75;
+  --sb-blur: 16px;
+  --sb-text-color: #FAF8F2;
+  --sb-line-color: #82977B;
+  --sb-base-color: #355746;
+  --sb-thickness: 1.5px;
+  --sb-angle: 135deg;
+  --sb-glow: 1.2;
+  --sb-intensity: 0.5;
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  margin: 0;
+  border: var(--sb-thickness) solid var(--sb-base-color);
+  border-radius: var(--sb-radius);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--sb-text-color);
+  background: color-mix(in srgb, var(--sb-tint) calc(var(--sb-tint-opacity) * 100%), transparent);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(var(--sb-blur));
+  backdrop-filter: blur(var(--sb-blur));
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+  overflow: hidden;
+}
+
+.specular-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px -12px rgba(36, 61, 50, 0.5), inset 0 1px 2px 0 rgba(255, 255, 255, 0.35);
+}
+
+.specular-button:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.specular-button:focus-visible {
+  outline: 2px solid var(--sb-line-color);
+  outline-offset: 3px;
+}
+
+.specular-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.specular-button--sm {
+  padding: 10px 22px;
+  font-size: 0.875rem;
+}
+
+.specular-button--md {
+  padding: 14px 28px;
+  font-size: 1rem;
+}
+
+.specular-button--lg {
+  padding: 16px 36px;
+  font-size: 1.05rem;
+}
+
+/* Dynamic Specular Border Shine */
+.specular-button__rim {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: var(--sb-thickness);
+  background: conic-gradient(
+    from var(--sb-angle),
+    transparent 0deg,
+    var(--sb-line-color) 45deg,
+    #FAF8F2 60deg,
+    var(--sb-line-color) 75deg,
+    transparent 120deg,
+    transparent 360deg
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: calc(var(--sb-intensity) * 0.9);
+  transition: opacity 0.2s ease;
+  z-index: 1;
+}
+
+/* Soft specular aura inside */
+.specular-button__aura {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--sb-line-color) calc(var(--sb-intensity) * 25%), transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: var(--sb-glow);
+  z-index: 0;
+  transition: opacity 0.25s ease;
+}
+
+.specular-button__label {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}

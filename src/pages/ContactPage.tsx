@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Send, CheckCircle2, AlertCircle, MapPin, Sparkles, MessageSquare } from 'lucide-react';
 import { portfolioService } from '../services/portfolioService';
+import { StaggerContainer, StaggerItem } from '../components/motion/StaggerGroup';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -45,9 +46,9 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-12 max-w-4xl mx-auto">
+    <StaggerContainer className="space-y-12 max-w-4xl mx-auto w-full">
       {/* Header */}
-      <section className="space-y-4">
+      <StaggerItem className="space-y-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-panel text-xs font-semibold uppercase tracking-wider text-[#355746]">
           <Mail className="w-3.5 h-3.5 text-[#80634D]" />
           <span>Get in Touch</span>
@@ -58,12 +59,12 @@ export const ContactPage: React.FC = () => {
         <p className="text-base sm:text-lg text-[#746F64] leading-relaxed max-w-xl">
           Interested in collaborating on a web project, digital media campaign, or creative endeavor? Send a message and I'll respond promptly.
         </p>
-      </section>
+      </StaggerItem>
 
       {/* Main Grid: Form and Contact Info */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
         {/* Info Sidebar */}
-        <div className="md:col-span-5 space-y-6">
+        <StaggerItem className="md:col-span-5 space-y-6">
           <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
             <h3 className="text-xl font-bold text-[#243D32]">Direct Channels</h3>
             
@@ -106,10 +107,10 @@ export const ContactPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </StaggerItem>
 
         {/* Contact Form */}
-        <div className="md:col-span-7">
+        <StaggerItem className="md:col-span-7">
           <div className="glass-panel rounded-3xl p-6 sm:p-8 shadow-xl relative">
             {submitted ? (
               <div className="py-12 text-center space-y-4 animate-in fade-in duration-300">
@@ -211,8 +212,8 @@ export const ContactPage: React.FC = () => {
               </form>
             )}
           </div>
-        </div>
+        </StaggerItem>
       </div>
-    </div>
+    </StaggerContainer>
   );
 };

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import SpecularButton from "@/components/ui/SpecularButton";
 
 export interface CtaProps {
   ctaEnabled?: boolean;
@@ -16,34 +15,51 @@ export interface CtaComponentProps {
   className?: string;
 }
 
-export function Cta({ cta, invert, className }: CtaComponentProps) {
+export function Cta({ cta, className }: CtaComponentProps) {
   if (!cta?.ctaEnabled) return null;
 
+  const btnSize = cta.size === "sm" ? "sm" : cta.size === "lg" ? "lg" : "md";
+
   const buttonContent = (
-    <Button
-      size={cta.size || "default"}
+    <SpecularButton
+      size={btnSize}
+      radius={24}
+      tint="#243D32"
+      tintOpacity={0.65}
+      blur={12}
+      textColor="#FAF8F2"
+      lineColor="#82977B"
+      baseColor="#355746"
+      intensity={1.2}
+      idleIntensity={0.45}
+      shineSize={14}
+      shineFade={36}
+      thickness={1.5}
+      glow={1.2}
+      followMouse
+      proximity={280}
       onClick={cta.onClick}
-      className={cn(
-        "rounded-full px-7 py-3 font-semibold text-sm shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer",
-        invert
-          ? "bg-white text-zinc-900 hover:bg-zinc-100 shadow-white/10"
-          : "bg-[#355746] text-[#FAF8F2] hover:bg-[#243D32]",
-        className
-      )}
+      className={className}
     >
-      {cta.text}
-    </Button>
+      <span className="font-semibold tracking-wide flex items-center gap-2">
+        {cta.text}
+      </span>
+    </SpecularButton>
   );
 
   if (cta.link) {
     if (cta.link.startsWith("http://") || cta.link.startsWith("https://")) {
       return (
-        <a href={cta.link} target="_blank" rel="noopener noreferrer">
+        <a href={cta.link} target="_blank" rel="noopener noreferrer" className="inline-block">
           {buttonContent}
         </a>
       );
     }
-    return <Link to={cta.link}>{buttonContent}</Link>;
+    return (
+      <Link to={cta.link} className="inline-block">
+        {buttonContent}
+      </Link>
+    );
   }
 
   return buttonContent;

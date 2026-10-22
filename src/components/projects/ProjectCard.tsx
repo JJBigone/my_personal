@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import type { Project } from '../../types/portfolio';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
 
@@ -9,15 +10,20 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, featured }) => {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
     <Link
       to={`/projects/${project.slug}`}
+      state={{ initialProject: project }}
       className={`group block glass-panel glass-card-hover rounded-3xl overflow-hidden text-decoration-none ${
         featured ? 'md:col-span-2' : ''
       }`}
     >
       <div className="relative aspect-video sm:aspect-16/10 overflow-hidden bg-[#D9C8AA]/30">
-        <img
+        <motion.img
+          layoutId={shouldReduceMotion ? undefined : `project-cover-${project.slug || project.id}`}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           src={project.cover_image_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800'}
           alt={project.title}
           loading="lazy"
