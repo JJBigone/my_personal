@@ -26,7 +26,7 @@ export const ProjectDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-4xl mx-auto py-12">
+      <div className="space-y-6 max-w-4xl mx-auto pt-28 pb-16 px-4 sm:px-8 w-full">
         <div className="h-6 w-32 glass-panel rounded-full animate-pulse" />
         <div className="h-12 w-3/4 glass-panel rounded-2xl animate-pulse" />
         <div className="aspect-video glass-panel rounded-3xl animate-pulse" />
@@ -36,7 +36,7 @@ export const ProjectDetailPage: React.FC = () => {
 
   if (!project) {
     return (
-      <div className="glass-panel rounded-3xl p-12 text-center space-y-4 max-w-md mx-auto my-12">
+      <div className="glass-panel rounded-3xl p-12 text-center space-y-4 max-w-md mx-auto my-24">
         <h2 className="text-2xl font-bold text-[#243D32]">Project Not Found</h2>
         <p className="text-sm text-[#746F64]">
           The requested project might have been moved, unpublished, or doesn't exist.
@@ -53,7 +53,7 @@ export const ProjectDetailPage: React.FC = () => {
   }
 
   return (
-    <article className="max-w-4xl mx-auto w-full">
+    <article className="max-w-4xl mx-auto w-full pt-28 pb-16 px-4 sm:px-8">
       <StaggerContainer className="space-y-12">
         {/* Back button */}
         <StaggerItem subtle>

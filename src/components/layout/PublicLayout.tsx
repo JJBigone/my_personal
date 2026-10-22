@@ -9,7 +9,6 @@ import { ScrollToTop } from '../motion/ScrollToTop';
 export const PublicLayout: React.FC = () => {
   const location = useLocation();
   const currentOutlet = useOutlet();
-  const isHome = location.pathname === '/';
 
   return (
     <div className="relative min-h-screen flex flex-col justify-between selection:bg-[#355746] selection:text-[#FAF8F2] overflow-x-hidden">
@@ -25,7 +24,7 @@ export const PublicLayout: React.FC = () => {
       <Navbar />
 
       {/* Main Page Content with Page Transition */}
-      <main className={isHome ? "flex-1 w-full flex flex-col" : "flex-1 pt-28 pb-12 px-4 sm:px-8 max-w-6xl mx-auto w-full flex flex-col"}>
+      <main className="flex-1 w-full flex flex-col">
         <AnimatePresence mode="wait" initial={false}>
           <PageTransition key={location.pathname}>
             {currentOutlet}

@@ -10,21 +10,18 @@ export const pageTransition: Transition = {
 export const getPageTransitionVariants = (reducedMotion: boolean): Variants => ({
   initial: {
     opacity: 0,
-    y: reducedMotion ? 0 : 8,
-    filter: reducedMotion ? 'none' : 'blur(8px)',
+    y: reducedMotion ? 0 : 6,
   },
   animate: {
     opacity: 1,
     y: 0,
-    filter: reducedMotion ? 'none' : 'blur(0px)',
     transition: pageTransition,
   },
   exit: {
     opacity: 0,
     y: reducedMotion ? 0 : -4,
-    filter: reducedMotion ? 'none' : 'blur(4px)',
     transition: {
-      duration: 0.28,
+      duration: 0.22,
       ease: [0.4, 0, 1, 1],
     },
   },

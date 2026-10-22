@@ -46,7 +46,7 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <StaggerContainer className="space-y-12 max-w-4xl mx-auto w-full">
+    <StaggerContainer className="space-y-12 max-w-4xl mx-auto w-full pt-28 pb-16 px-4 sm:px-8">
       {/* Header */}
       <StaggerItem className="space-y-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-panel text-xs font-semibold uppercase tracking-wider text-[#355746]">

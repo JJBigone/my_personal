@@ -42,7 +42,7 @@ export const ProjectsPage: React.FC = () => {
   }, [projects, selectedCategory, searchQuery]);
 
   return (
-    <StaggerContainer className="space-y-12">
+    <StaggerContainer className="space-y-12 max-w-6xl mx-auto w-full pt-28 pb-16 px-4 sm:px-8">
       {/* Header */}
       <StaggerItem className="space-y-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full glass-panel text-xs font-semibold uppercase tracking-wider text-[#355746]">
