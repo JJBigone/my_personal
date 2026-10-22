@@ -7,11 +7,10 @@ import { ProjectCard } from '../components/projects/ProjectCard';
 import Hero12, { type Hero12Props } from '@/components/ui/hero-12';
 
 const HERO_VALUES: Hero12Props = {
-  title: "Pacharaphum Profile",
-  established: "Est. 2024",
+  title: "Pacharaphum Maruek",
   description:
     "Student at Nakhon Si Thammarat Technical College. Passionate about software development, interactive media, and modern web applications.",
-  backgroundImage: "/hero-carousel-1.png",
+  backgroundImage: "/banner.png",
   backgroundAlt: "Pacharaphum Profile Hero Banner",
   animation: "subtle",
   primaryCTA: {
