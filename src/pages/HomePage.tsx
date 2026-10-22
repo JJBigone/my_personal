@@ -1,9 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Gamepad2, Compass, Layers, Terminal } from 'lucide-react';
+import { ArrowRight, Compass, Layers, Terminal } from 'lucide-react';
 import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
 import { ProjectCard } from '../components/projects/ProjectCard';
+import Hero12, { type Hero12Props } from '@/components/ui/hero-12';
+
+const HERO_VALUES: Hero12Props = {
+  title: "Pacharaphum Profile",
+  established: "Est. 2024",
+  description:
+    "Student at Nakhon Si Thammarat Technical College. Passionate about software development, interactive media, and modern web applications.",
+  backgroundImage: "/hero-carousel-1.png",
+  backgroundAlt: "Pacharaphum Profile Hero Banner",
+  animation: "subtle",
+  primaryCTA: {
+    ctaEnabled: true,
+    text: "Explore Projects",
+    link: "/projects",
+    size: "default",
+  },
+  variant: "fullscreen",
+};
 
 export const HomePage: React.FC = () => {
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
@@ -17,92 +35,12 @@ export const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-24">
-      {/* Hero Section */}
-      <section className="relative pt-6 sm:pt-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Headline & Description */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs font-semibold uppercase tracking-wider text-[#355746]">
-              <Sparkles className="w-3.5 h-3.5 text-[#80634D]" />
-              <span>Personal Portfolio</span>
-            </div>
+    <div className="w-full">
+      {/* Fullscreen Hero12 Section with Floating Navbar */}
+      <Hero12 {...HERO_VALUES} />
 
-            <h1 className="text-4xl sm:text-6xl font-extrabold text-[#243D32] tracking-tight leading-[1.12]">
-              Creating Digital Experiences Through <span className="text-[#355746] underline decoration-[#82977B]/50 underline-offset-8">Creativity</span> &amp; Technology.
-            </h1>
-
-            <p className="text-base sm:text-lg text-[#746F64] leading-relaxed max-w-xl">
-              I'm passionate about digital content, gaming, technology, and building creative projects that combine high functionality with tactile visual storytelling.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Link
-                to="/projects"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] font-semibold text-sm shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
-              >
-                <span>Explore My Work</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/about"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full glass-panel hover:bg-[#FAF8F2]/90 text-[#243D32] font-semibold text-sm transition-all duration-300"
-              >
-                <span>About Me</span>
-              </Link>
-            </div>
-
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-3 gap-4 pt-6 max-w-md">
-              <div className="glass-panel-subtle rounded-2xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#243D32]">100%</div>
-                <div className="text-xs text-[#746F64] mt-0.5">Passion &amp; Focus</div>
-              </div>
-              <div className="glass-panel-subtle rounded-2xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#355746]">Fast</div>
-                <div className="text-xs text-[#746F64] mt-0.5">Vite + React</div>
-              </div>
-              <div className="glass-panel-subtle rounded-2xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#80634D]">Modern</div>
-                <div className="text-xs text-[#746F64] mt-0.5">Liquid Glass</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Hero Visual Card / Floating Panels */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-md">
-              {/* Main Decorative Frame */}
-              <div className="aspect-4/5 rounded-3xl overflow-hidden glass-panel p-3 shadow-2xl relative">
-                <img
-                  src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop"
-                  alt="Creative work station"
-                  className="w-full h-full object-cover rounded-2xl"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#243D32]/60 via-transparent to-transparent rounded-2xl" />
-              </div>
-
-              {/* Floating Glass Pill: Creative Tech */}
-              <div className="absolute -bottom-6 -left-6 glass-panel rounded-2xl p-4 shadow-xl flex items-center gap-3 backdrop-blur-xl animate-bounce-slow">
-                <div className="w-10 h-10 rounded-xl bg-[#355746] text-[#FAF8F2] flex items-center justify-center">
-                  <Gamepad2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-[#243D32]">Gaming &amp; Media</div>
-                  <div className="text-[11px] text-[#746F64]">Interactive Creations</div>
-                </div>
-              </div>
-
-              {/* Floating Glass Pill: Status */}
-              <div className="absolute -top-4 -right-4 glass-panel rounded-2xl py-2.5 px-4 shadow-lg flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-medium text-[#243D32]">Available for Collabs</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Main Page Sections */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-20 space-y-24">
 
       {/* Featured Projects Section */}
       <section className="space-y-8">
@@ -205,6 +143,7 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 };
