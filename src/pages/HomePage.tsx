@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Compass, Layers, Terminal } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
-import { ProjectCard } from '../components/projects/ProjectCard';
 import Hero12, { type Hero12Props } from '@/components/ui/hero-12';
 import TechText from '@/components/ui/TechText';
 import BlurText from '@/components/ui/BlurText';
-import { StaggerContainer, StaggerItem } from '../components/motion/StaggerGroup';
-import { LiquidGlassReveal } from '../components/motion/LiquidGlassReveal';
+import { TiltedGridHero } from '@/components/ui/tilted-grid-hero';
 
 const HERO_VALUES: Hero12Props = {
   title: "Pacharaphum Maruek",
@@ -64,133 +62,113 @@ const HERO_VALUES: Hero12Props = {
 };
 
 export const HomePage: React.FC = () => {
-  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
 
   useEffect(() => {
     portfolioService.getPublishedProjects().then((data) => {
-      setFeaturedProjects(data.slice(0, 3));
-      setLoading(false);
+      setAllProjects(data);
     });
   }, []);
 
+  const heroProjectImages = useMemo(() => {
+    if (allProjects.length > 0) {
+      return allProjects.map((p) => ({
+        src: p.cover_image_url,
+        alt: p.title,
+      }));
+    }
+    return [
+      {
+        src: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop",
+        alt: "AuraCraft Gaming Hub",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+        alt: "Nexus Telemetry Cockpit",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
+        alt: "Earth & Canvas Magazine",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1200&auto=format&fit=crop",
+        alt: "Lumina Video Stream Manager",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1200&auto=format&fit=crop",
+        alt: "Verdant Soundboard Synthesizer",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
+        alt: "CyberForge 3D Studio",
+      },
+      {
+        src: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop",
+        alt: "Botanica Brand Lookbook",
+      },
+    ];
+  }, [allProjects]);
+
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       {/* Fullscreen Hero12 Section with Floating Navbar */}
       <Hero12 {...HERO_VALUES} />
 
-      {/* Main Page Sections */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-20">
-        <StaggerContainer className="space-y-24">
-          {/* Featured Projects Section */}
-          <StaggerItem className="space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#82977B]">
-                  Selected Works
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#243D32] tracking-tight mt-1">
-                  Featured Projects
-                </h2>
+      {/* Full-width Edge-to-Edge Cylindrical 3D Showcase (Selected Works / Featured Projects) */}
+      <section className="relative w-full border-t border-b border-[#D9C8AA]/30 overflow-hidden bg-gradient-to-b from-[#FAF8F2] via-[#F3EBDD]/40 to-[#FAF8F2]">
+        {/* Subtle background mesh grid */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage: "radial-gradient(#243D32 1.2px, transparent 1.4px)",
+            backgroundSize: "28px 28px",
+          }}
+        />
+
+        <TiltedGridHero
+          images={heroProjectImages}
+          speed={3.6}
+          tileHeight={30}
+          aspectRatio={16 / 9}
+          gap={6}
+          axis={54}
+          curve={78}
+          fade={12}
+          className="h-[640px] sm:h-[720px] lg:h-[780px] w-full"
+        >
+          <div className="relative z-10 flex h-full flex-col items-center justify-between py-14 sm:py-16 text-center pointer-events-none">
+            {/* Header Content */}
+            <div className="px-6 pointer-events-auto max-w-3xl space-y-3">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAF8F2]/90 backdrop-blur-md border border-[#D9C8AA]/60 text-xs font-semibold uppercase tracking-wider text-[#355746] shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-[#80634D]" />
+                <span>Selected Works · Featured Projects</span>
               </div>
-              <Link
-                to="/projects"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[#355746] hover:text-[#243D32] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746] rounded-full px-3 py-1"
-              >
-                <span>View All Projects</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <h2 className="text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#243D32] drop-shadow-sm">
+                Every project,
+                <br />
+                brought into focus.
+              </h2>
             </div>
 
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="glass-panel h-80 rounded-3xl animate-pulse" />
-                <div className="glass-panel h-80 rounded-3xl animate-pulse" />
+            {/* Bottom Callout & Action */}
+            <div className="px-6 pointer-events-auto space-y-4 max-w-xl">
+              <p className="text-balance text-xs sm:text-sm md:text-base text-[#4B382D] font-medium bg-[#FAF8F2]/85 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#D9C8AA]/50 shadow-md">
+                Stream of interactive web systems, esports portals, audio synthesizers, and creative media.
+              </p>
+              <div className="flex items-center justify-center gap-3">
+                <Link
+                  to="/projects"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] font-bold text-sm shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746]"
+                >
+                  <span>Explore All Projects</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredProjects.map((project, idx) => (
-                  <ProjectCard key={project.id} project={project} featured={idx === 0} />
-                ))}
-              </div>
-            )}
-          </StaggerItem>
-
-          {/* Creative Philosophy & Pillars with Liquid Reveal */}
-          <StaggerItem>
-            <LiquidGlassReveal variant="cream">
-              <section className="glass-panel rounded-3xl p-8 sm:p-12 shadow-lg space-y-10">
-                <div className="max-w-2xl">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#82977B]">
-                    Creative Approach
-                  </span>
-                  <h2 className="text-3xl font-bold text-[#243D32] mt-1">
-                    Bridging Aesthetics &amp; Practical Utility
-                  </h2>
-                  <p className="text-sm sm:text-base text-[#746F64] mt-3">
-                    Every digital piece begins with human curiosity: understanding what makes an experience memorable, functional, and visually pleasant.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  <div className="glass-panel-subtle rounded-2xl p-6 space-y-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#82977B]/20 text-[#355746] flex items-center justify-center">
-                      <Compass className="w-5 h-5" />
-                    </div>
-                    <h3 className="font-bold text-base text-[#243D32]">Organic Visual Direction</h3>
-                    <p className="text-xs text-[#746F64] leading-relaxed">
-                      Nature-inspired color balance, soft ambient glass lighting, and responsive typography that feels organic.
-                    </p>
-                  </div>
-
-                  <div className="glass-panel-subtle rounded-2xl p-6 space-y-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#A0A37A]/20 text-[#4B382D] flex items-center justify-center">
-                      <Terminal className="w-5 h-5" />
-                    </div>
-                    <h3 className="font-bold text-base text-[#243D32]">Modern Technical Stack</h3>
-                    <p className="text-xs text-[#746F64] leading-relaxed">
-                      Fast client-side rendering with Vite, React 19, Supabase backend security, and resilient data models.
-                    </p>
-                  </div>
-
-                  <div className="glass-panel-subtle rounded-2xl p-6 space-y-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#80634D]/20 text-[#80634D] flex items-center justify-center">
-                      <Layers className="w-5 h-5" />
-                    </div>
-                    <h3 className="font-bold text-base text-[#243D32]">Full Project Lifecycle</h3>
-                    <p className="text-xs text-[#746F64] leading-relaxed">
-                      From creative concept, digital streaming assets, to full interactive web deployment and maintenance.
-                    </p>
-                  </div>
-                </div>
-              </section>
-            </LiquidGlassReveal>
-          </StaggerItem>
-
-          {/* Call To Action Banner */}
-          <StaggerItem>
-            <section className="glass-panel-dark rounded-3xl p-8 sm:p-14 text-center space-y-6 shadow-2xl relative overflow-hidden">
-              <div className="max-w-2xl mx-auto space-y-4 relative z-10">
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#FAF8F2] tracking-tight">
-                  Have a project or creative vision in mind?
-                </h2>
-                <p className="text-sm sm:text-base text-[#D9C8AA]/90 max-w-lg mx-auto">
-                  Whether it's interactive web design, video creation, gaming content, or technical collaboration, let's connect and make it happen.
-                </p>
-                <div className="pt-2">
-                  <Link
-                    to="/contact"
-                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#FAF8F2] text-[#243D32] hover:bg-[#F3EBDD] font-bold text-sm shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAF8F2]"
-                  >
-                    <span>Start a Conversation</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </section>
-          </StaggerItem>
-        </StaggerContainer>
-      </div>
+            </div>
+          </div>
+        </TiltedGridHero>
+      </section>
     </div>
   );
 };
