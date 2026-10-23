@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: #FAF8F2;
+  --color-foreground: #243D32;
+  --color-muted-foreground: #746F64;
+  --color-muted: #746F64;
+  --color-forest: #355746;
+  --color-forest-deep: #243D32;
+  --color-sage: #82977B;
+  --color-olive: #A0A37A;
+  --color-sand: #D9C8AA;
+  --color-cream: #F3EBDD;
+  --color-off-white: #FAF8F2;
+}
+
 @layer base {
   :root {
     --forest-deep: #243D32;
