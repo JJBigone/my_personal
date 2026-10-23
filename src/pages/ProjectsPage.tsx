@@ -1,19 +1,21 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
 import { ProjectCard } from '../components/projects/ProjectCard';
-import GlassFolder, { type FolderFile } from '../components/ui/glass-folder-cards';
-import { Search, FolderGit2, Filter, Layers, LayoutGrid, Sparkles, FolderOpen, MousePointerClick } from 'lucide-react';
-import { StaggerContainer, StaggerItem } from '../components/motion/StaggerGroup';
+import Folder, { type FolderItem } from '../components/ui/Folder';
+import { Sparkles, ArrowRight, Layers, LayoutGrid, Search, Filter } from 'lucide-react';
 
 export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
+  const [viewMode, setViewMode] = useState<'folders' | 'grid'>('folders');
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'folders' | 'grid'>('folders');
+  const [activeItemToast, setActiveItemToast] = useState<{ title: string; href?: string } | null>(null);
+
+  const toastRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     portfolioService.getPublishedProjects().then((data) => {
@@ -21,6 +23,32 @@ export const ProjectsPage: React.FC = () => {
       setLoading(false);
     });
   }, []);
+
+  // Auto-dismiss or outside-click dismiss for activeItemToast
+  useEffect(() => {
+    if (!activeItemToast) return;
+
+    // Auto-dismiss after 6 seconds
+    const timer = setTimeout(() => {
+      setActiveItemToast(null);
+    }, 6000);
+
+    const handleOutsideClick = (e: MouseEvent | PointerEvent) => {
+      if (toastRef.current && !toastRef.current.contains(e.target as Node)) {
+        setActiveItemToast(null);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('pointerdown', handleOutsideClick);
+    }, 150);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(timeoutId);
+      document.removeEventListener('pointerdown', handleOutsideClick);
+    };
+  }, [activeItemToast]);
 
   // Compute dynamic categories based on loaded projects
   const categories = useMemo(() => {
@@ -45,376 +73,362 @@ export const ProjectsPage: React.FC = () => {
     });
   }, [projects, selectedCategory, searchQuery]);
 
-  // Handle navigating when a file is selected inside a Glass Folder
-  const handleFileSelect = (file: FolderFile) => {
-    if (file.href && file.href.startsWith('/')) {
-      navigate(file.href);
-    } else if (file.href) {
-      window.open(file.href, '_blank', 'noopener,noreferrer');
+  // Handle clicking on an item inside 3D Folder
+  const handleFolderItemClick = (item: FolderItem | null) => {
+    if (!item) {
+      setActiveItemToast(null);
+      return;
+    }
+    if (typeof item === 'object' && item !== null && 'title' in item) {
+      setActiveItemToast({
+        title: item.title || 'Selected Project',
+        href: item.href,
+      });
     }
   };
 
-  // Curated Glass Folders collections separating works by discipline
-  const webAppFiles: FolderFile[] = [
+  // Data for 3D Folders
+  const reactBitsWebApps: FolderItem[] = [
     {
-      name: 'AuraCraft Gaming Hub',
-      meta: 'Web App · React & Supabase',
+      title: 'AuraCraft Hub',
+      description: 'React & Supabase esports portal with real-time tournament brackets.',
       image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop',
       href: '/projects/auracraft-gaming-hub',
     },
     {
-      name: 'Nexus Telemetry Cockpit',
-      meta: 'Next.js · Real-time Analytics',
+      title: 'Nexus Telemetry',
+      description: 'Next.js real-time AI workload analytics and trace monitor.',
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop',
       href: '/projects/nexus-telemetry-dashboard',
     },
     {
-      name: 'Cloud-Architecture-Specs.pdf',
-      meta: 'PDF · 1.4 MB',
-      art: 'aurora',
+      title: 'Microservices Architecture',
+      description: 'High-availability cluster specs, WebSockets & API schemas.',
     },
   ];
 
-  const creativeMediaFiles: FolderFile[] = [
+  const reactBitsMedia: FolderItem[] = [
     {
-      name: 'Earth & Canvas Magazine',
-      meta: 'Editorial · Fluid Layout',
+      title: 'Earth & Canvas',
+      description: 'Tactile editorial magazine with fluid liquid typography.',
       image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop',
       href: '/projects/earth-and-canvas-magazine',
     },
     {
-      name: 'Lumina Video Stream Manager',
-      meta: 'Creator Cloud Tool',
+      title: 'Lumina Video',
+      description: 'Cloud video workflow tool for creators to render stream highlights.',
       image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=800&auto=format&fit=crop',
       href: '/projects/lumina-video-asset-manager',
     },
     {
-      name: 'Cinematic Grade v4.drx',
-      meta: 'LUT / DRX · 24 MB',
-      art: 'ember',
-    },
-    {
-      name: 'Design-Tokens-Spec.json',
-      meta: 'Design System',
+      title: 'Cinematic Grade v4',
+      description: 'DRX 3D LUT lookbook & HDR broadcast grading profiles.',
     },
   ];
 
-  const labExperimentsFiles: FolderFile[] = [
+  const reactBitsLab: FolderItem[] = [
     {
-      name: 'Verdant Soundboard Synthesizer',
-      meta: 'Web Audio API · Generative Synth',
+      title: 'Verdant Sound',
+      description: 'Generative Web Audio synth with ambient nature loop layer.',
       image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop',
       href: '/projects/verdant-soundboard',
     },
     {
-      name: 'CyberForge 3D Studio',
-      meta: 'WebGL & Three.js · PBR Shaders',
+      title: 'CyberForge 3D',
+      description: 'WebGL procedural PBR shader generator with WebGPU support.',
       image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
       href: '/projects/cyberforge-3d-asset-studio',
     },
     {
-      name: 'Botanica Brand Identity',
-      meta: 'Sustainable Commerce Concept',
+      title: 'Botanica Brand',
+      description: 'E-commerce lookbook celebrating sustainable organic artisans.',
       image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop',
       href: '/projects/botanica-organic-brand',
     },
-    {
-      name: 'Shader-Source-GLSL.frag',
-      meta: 'GPU Raymarching',
-      art: 'glacier',
-    },
   ];
 
-  const archiveDocumentsFiles: FolderFile[] = [
+  const reactBitsArchives: FolderItem[] = [
     {
-      name: 'Technical-College-Thesis.pdf',
-      meta: 'PDF · NSTTC 2026',
-      art: 'dusk',
+      title: 'NSTTC Thesis 2026',
+      description: 'Software engineering & interactive web systems capstone dissertation.',
     },
     {
-      name: 'Lighthouse-Audit-100.pdf',
-      meta: 'Performance Report',
+      title: 'Performance Audit',
+      description: 'Lighthouse 100/100 Core Web Vitals optimization audit.',
     },
     {
-      name: 'Client-Contract-Brief.pdf',
-      meta: 'PDF · 480 KB',
-      art: 'verdant',
-    },
-    {
-      name: 'Asset-Inventory-Manifest.csv',
-      meta: 'Data Sheet',
+      title: 'Client Contract SOW',
+      description: 'Scope of work template, SLA guidelines, and commercial roadmap.',
     },
   ];
 
   return (
-    <StaggerContainer className="space-y-12 max-w-7xl mx-auto w-full pt-28 pb-20 px-4 sm:px-8">
-      {/* Header with Title & View Mode Switcher */}
-      <StaggerItem className="space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-panel text-xs font-semibold uppercase tracking-wider text-[#355746]">
-            <FolderGit2 className="w-3.5 h-3.5 text-[#80634D]" />
-            <span>Interactive Portfolio Showcase</span>
-          </div>
+    <div className="w-full min-h-screen pt-24 pb-16 px-4 sm:px-8 xl:px-12 flex flex-col items-center relative overflow-visible">
+      {/* Ambient background dot grid */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage: 'radial-gradient(#243D32 1.4px, transparent 1.6px)',
+          backgroundSize: '28px 28px',
+        }}
+      />
 
-          {/* Mode Switcher */}
-          <div className="flex items-center p-1 rounded-2xl glass-panel shadow-sm">
-            <button
-              type="button"
-              onClick={() => setViewMode('folders')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                viewMode === 'folders'
-                  ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
-                  : 'text-[#4B382D] hover:text-[#243D32]'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Glass Folders</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                viewMode === 'grid'
-                  ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
-                  : 'text-[#4B382D] hover:text-[#243D32]'
-              }`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Full Grid View</span>
-            </button>
-          </div>
+      {/* Top Floating Control Bar: View Switcher */}
+      <div className="w-full max-w-[1600px] flex items-center justify-between gap-4 mb-6 relative z-30">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#355746] animate-pulse" />
+          <span className="text-xs font-bold uppercase tracking-wider text-[#243D32]">
+            {viewMode === 'folders' ? '3D Folders' : 'All Projects'}
+          </span>
         </div>
 
-        <div className="max-w-3xl space-y-3">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-[#243D32] tracking-tight">
-            Curated Works &amp; Creative Folders
-          </h1>
-          <p className="text-base sm:text-lg text-[#746F64] leading-relaxed">
-            {viewMode === 'folders'
-              ? 'เปิดสำรวจแฟ้มผลงานในรูปแบบ 3D Frosted Glass Folders แยกตามประเภทงาน คลิกที่โฟลเดอร์เพื่อกางไฟล์ออก และคลิกที่แผ่นผลงานเพื่อดูรายละเอียด'
-              : 'Explore all individual projects, interactive systems, soundscapes, and applications with searchable technology tags.'}
-          </p>
+        {/* View Mode Switcher (Folders vs Full Grid) */}
+        <div className="flex items-center p-1 rounded-2xl glass-panel shadow-sm border border-[#D9C8AA]/40">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveItemToast(null);
+              setViewMode('folders');
+            }}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              viewMode === 'folders'
+                ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
+                : 'text-[#4B382D] hover:text-[#243D32]'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>Interactive Folders</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveItemToast(null);
+              setViewMode('grid');
+            }}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              viewMode === 'grid'
+                ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
+                : 'text-[#4B382D] hover:text-[#243D32]'
+            }`}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>Grid View</span>
+          </button>
         </div>
-      </StaggerItem>
+      </div>
 
-      {/* Main Content Area: Folders Experience OR Grid View */}
-      {viewMode === 'folders' ? (
-        <StaggerItem className="space-y-10">
-          {/* Subtle instruction banner */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl glass-panel-subtle text-xs sm:text-sm text-[#746F64]">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#80634D] animate-pulse" />
-              <span>
-                <strong>โฟลเดอร์กระจกแบบอินเทอร์แอคทีฟ:</strong> เลื่อนเมาส์ผ่านเพื่อเอียงโฟลเดอร์ · คลิกเพื่อเปิดแฟ้ม · คลิกที่แผ่นงานเพื่อเปิดดูโปรเจกต์
-              </span>
-            </div>
-            <div className="hidden md:flex items-center gap-1.5 text-[11px] font-mono text-[#80634D] bg-[#FAF8F2]/80 px-2.5 py-1 rounded-full">
-              <MousePointerClick className="w-3.5 h-3.5" />
-              <span>CLICK TO EXPAND FILES</span>
-            </div>
+      {/* Active Item Toast / Action Banner when an item is clicked */}
+      {activeItemToast && (
+        <div
+          ref={toastRef}
+          className="fixed top-24 z-50 p-4 rounded-2xl bg-[#355746] text-[#FAF8F2] flex items-center gap-4 shadow-xl border border-[#FAF8F2]/20 animate-in fade-in slide-in-from-top-3 duration-300"
+        >
+          <div className="flex items-center gap-2.5">
+            <Sparkles className="w-4 h-4 text-[#A0A37A]" />
+            <span className="text-sm font-medium">
+              Selected: <strong>{activeItemToast.title}</strong>
+            </span>
           </div>
-
-          {/* 3D Glass Folders Showcase Grid */}
-          <section className="relative rounded-3xl glass-panel p-6 sm:p-12 overflow-visible">
-            {/* Ambient desk pattern */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 opacity-[0.09] rounded-3xl"
-              style={{
-                backgroundImage: 'radial-gradient(#243D32 1.2px, transparent 1.4px)',
-                backgroundSize: '24px 24px',
-              }}
-            />
-
-            <div className="relative grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-8 gap-y-16 items-end justify-items-center">
-              {/* Folder 1: Web Applications */}
-              <div className="flex flex-col items-center">
-                <GlassFolder
-                  label="Web Apps"
-                  art="aurora"
-                  seed={4}
-                  action="add"
-                  appearDelay={0}
-                  files={webAppFiles}
-                  onFileSelect={handleFileSelect}
-                  onAdd={() => ({
-                    name: 'New Concept ' + (webAppFiles.length + 1),
-                    meta: 'Draft · Just added',
-                    art: 'glacier',
-                  })}
-                  menu={[
-                    { label: 'View All Web Projects', onSelect: () => setSelectedCategory('Web Development') },
-                    { label: 'Copy Category Link', onSelect: () => navigator.clipboard?.writeText(window.location.href) },
-                  ]}
-                />
-                <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#80634D]">
-                  Fullstack &amp; SaaS
-                </span>
-              </div>
-
-              {/* Folder 2: Creative Media */}
-              <div className="flex flex-col items-center">
-                <GlassFolder
-                  label="Media &amp; Video"
-                  tone="dark"
-                  art="ember"
-                  seed={11}
-                  action="more"
-                  labelPlacement="top-left"
-                  appearDelay={120}
-                  files={creativeMediaFiles}
-                  onFileSelect={handleFileSelect}
-                  menu={[
-                    { label: 'Filter Media Works', onSelect: () => setSelectedCategory('Video Editing') },
-                    { label: 'View Editorial Magazine', onSelect: () => navigate('/projects/earth-and-canvas-magazine') },
-                  ]}
-                />
-                <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#80634D]">
-                  Video &amp; Editorial Design
-                </span>
-              </div>
-
-              {/* Folder 3: Creative Tech & Audio Lab */}
-              <div className="flex flex-col items-center">
-                <GlassFolder
-                  label="Audio &amp; 3D Lab"
-                  tone="light"
-                  art="verdant"
-                  seed={8}
-                  action="add"
-                  labelPlacement="bottom-left"
-                  appearDelay={220}
-                  files={labExperimentsFiles}
-                  onFileSelect={handleFileSelect}
-                  onAdd={() => ({
-                    name: 'Generative Patch #' + Math.floor(Math.random() * 900 + 100),
-                    meta: 'Audio Node · Active',
-                    art: 'verdant',
-                  })}
-                />
-                <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#80634D]">
-                  Audio API &amp; WebGL
-                </span>
-              </div>
-
-              {/* Folder 4: Documents & Case Studies */}
-              <div className="flex flex-col items-center">
-                <GlassFolder
-                  label="Archives &amp; Docs"
-                  tone="light"
-                  art="dusk"
-                  seed={15}
-                  action="more"
-                  labelPlacement="top-right"
-                  appearDelay={320}
-                  files={archiveDocumentsFiles}
-                  onFileSelect={handleFileSelect}
-                  menu={[
-                    { label: 'Download Resume', onSelect: () => navigate('/about') },
-                    { label: 'View Skills Matrix', onSelect: () => navigate('/skills') },
-                    { label: 'Contact Me', onSelect: () => navigate('/contact') },
-                  ]}
-                />
-                <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#80634D]">
-                  Specs, Audits &amp; Docs
-                </span>
-              </div>
-            </div>
-
-            {/* Bottom Footer Callout */}
-            <div className="mt-14 pt-8 border-t border-[#D9C8AA]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-              <div>
-                <p className="text-sm font-semibold text-[#243D32]">ต้องการดูรายละเอียดโปรเจกต์ทั้งหมดพร้อมกัน?</p>
-                <p className="text-xs text-[#746F64]">สลับไปยังมุมมองตาราง หรือเลื่อนลงเพื่อดูโปรเจกต์เด่นด้านล่าง</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#355746] text-[#FAF8F2] text-xs font-bold shadow-md hover:bg-[#243D32] transition-colors"
-              >
-                <FolderOpen className="w-4 h-4" />
-                <span>เปิดดูโปรเจกต์ทั้งหมด (All Projects Grid)</span>
-              </button>
-            </div>
-          </section>
-        </StaggerItem>
-      ) : null}
-
-      {/* Filter and Search Bar for Projects Grid */}
-      <StaggerItem>
-        <section className="glass-panel rounded-3xl p-4 sm:p-6 shadow-md flex flex-col md:flex-row gap-4 items-center justify-between">
-          {/* Category Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
-            <Filter className="w-4 h-4 text-[#80634D] hidden sm:block mr-1" />
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746] ${
-                  selectedCategory === cat
-                    ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
-                    : 'bg-[#FAF8F2]/60 hover:bg-[#FAF8F2] text-[#4B382D]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Search Input */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-[#746F64] absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search projects or tech..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-full glass-input text-[#243D32] placeholder:text-[#746F64]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746]"
-            />
-          </div>
-        </section>
-      </StaggerItem>
-
-      {/* Projects Grid List */}
-      <StaggerItem>
-        <section>
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="glass-panel h-80 rounded-3xl animate-pulse" />
-              ))}
-            </div>
-          ) : filteredProjects.length === 0 ? (
-            <div className="glass-panel rounded-3xl p-12 text-center space-y-3">
-              <h3 className="text-xl font-bold text-[#243D32]">No projects found</h3>
-              <p className="text-sm text-[#746F64]">
-                Try searching with another keyword or selecting a different category.
-              </p>
+          <div className="flex items-center gap-2">
+            {activeItemToast.href && (
               <button
                 type="button"
                 onClick={() => {
-                  setSelectedCategory('All');
-                  setSearchQuery('');
+                  setActiveItemToast(null);
+                  navigate(activeItemToast.href!);
                 }}
-                className="mt-2 px-5 py-2 rounded-full bg-[#355746] text-[#FAF8F2] text-xs font-semibold"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF8F2] text-[#243D32] hover:bg-[#F3EBDD] font-bold text-xs shadow transition-all cursor-pointer"
               >
-                Reset Filters
+                <span>View Project</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setActiveItemToast(null)}
+              className="px-2.5 py-1 rounded-full text-xs text-[#FAF8F2]/70 hover:text-white transition-colors cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Mode 1: 3D Folders (Full Width & Clean) */}
+      {viewMode === 'folders' ? (
+        <div
+          className="w-full max-w-[1600px] flex-1 flex flex-col justify-center items-center py-8 my-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setActiveItemToast(null);
+            }
+          }}
+        >
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 sm:gap-x-8 lg:gap-x-10 xl:gap-x-12 gap-y-16 items-end justify-items-center">
+            {/* 1. Web Apps (Forest Green: #355746) */}
+            <div className="flex flex-col items-center relative transition-all duration-300">
+              <Folder
+                label="Web Apps"
+                mode="flap"
+                variant="solid"
+                color="#355746"
+                paperColor="#FAF8F2"
+                theme="light"
+                size={1.12}
+                draggable={false}
+                items={reactBitsWebApps}
+                onItemClick={handleFolderItemClick}
+              />
+              <div className="mt-7 text-center">
+                <span className="text-sm font-extrabold text-[#355746] uppercase tracking-wider block">
+                  WEB &amp; FULLSTACK
+                </span>
+              </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProjects.map((project, idx) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  featured={idx === 0 && selectedCategory === 'All' && !searchQuery}
-                />
+
+            {/* 2. Media & Video (Earth Brown: #80634D) */}
+            <div className="flex flex-col items-center relative transition-all duration-300">
+              <Folder
+                label="Media & Video"
+                mode="flap"
+                variant="solid"
+                color="#80634D"
+                paperColor="#FAF8F2"
+                theme="light"
+                size={1.12}
+                draggable={false}
+                items={reactBitsMedia}
+                onItemClick={handleFolderItemClick}
+              />
+              <div className="mt-7 text-center">
+                <span className="text-sm font-extrabold text-[#80634D] uppercase tracking-wider block">
+                  VIDEO &amp; EDITORIAL
+                </span>
+              </div>
+            </div>
+
+            {/* 3. Audio & 3D Lab (Sage Green: #82977B) */}
+            <div className="flex flex-col items-center relative transition-all duration-300">
+              <Folder
+                label="Creative Lab"
+                mode="flap"
+                variant="solid"
+                color="#82977B"
+                paperColor="#FAF8F2"
+                theme="light"
+                size={1.12}
+                draggable={false}
+                items={reactBitsLab}
+                onItemClick={handleFolderItemClick}
+              />
+              <div className="mt-7 text-center">
+                <span className="text-sm font-extrabold text-[#82977B] uppercase tracking-wider block">
+                  AUDIO &amp; WEBGL
+                </span>
+              </div>
+            </div>
+
+            {/* 4. Archives & Docs (Deep Forest: #243D32) */}
+            <div className="flex flex-col items-center relative transition-all duration-300">
+              <Folder
+                label="Archives & Docs"
+                mode="flap"
+                variant="solid"
+                color="#243D32"
+                paperColor="#F3EBDD"
+                theme="light"
+                size={1.12}
+                draggable={false}
+                items={reactBitsArchives}
+                onItemClick={handleFolderItemClick}
+              />
+              <div className="mt-7 text-center">
+                <span className="text-sm font-extrabold text-[#243D32] uppercase tracking-wider block">
+                  SPECS &amp; REPORTS
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Mode 2: Full Grid View with Search and Filter */
+        <div className="w-full max-w-7xl space-y-8 py-6">
+          {/* Filter and Search Bar for Projects Grid */}
+          <section className="glass-panel rounded-3xl p-4 sm:p-6 shadow-md flex flex-col md:flex-row gap-4 items-center justify-between">
+            {/* Category Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+              <Filter className="w-4 h-4 text-[#80634D] hidden sm:block mr-1" />
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746] ${
+                    selectedCategory === cat
+                      ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
+                      : 'bg-[#FAF8F2]/60 hover:bg-[#FAF8F2] text-[#4B382D]'
+                  }`}
+                >
+                  {cat}
+                </button>
               ))}
             </div>
-          )}
-        </section>
-      </StaggerItem>
-    </StaggerContainer>
+
+            {/* Search Input */}
+            <div className="relative w-full md:w-72">
+              <Search className="w-4 h-4 text-[#746F64] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search projects or tech..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-full glass-input text-[#243D32] placeholder:text-[#746F64]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746]"
+              />
+            </div>
+          </section>
+
+          {/* Projects Grid List */}
+          <section>
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <div key={n} className="glass-panel h-80 rounded-3xl animate-pulse" />
+                ))}
+              </div>
+            ) : filteredProjects.length === 0 ? (
+              <div className="glass-panel rounded-3xl p-12 text-center space-y-3">
+                <h3 className="text-xl font-bold text-[#243D32]">No projects found</h3>
+                <p className="text-sm text-[#746F64]">
+                  Try searching with another keyword or selecting a different category.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory('All');
+                    setSearchQuery('');
+                  }}
+                  className="mt-2 px-5 py-2 rounded-full bg-[#355746] text-[#FAF8F2] text-xs font-semibold"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProjects.map((project, idx) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    featured={idx === 0 && selectedCategory === 'All' && !searchQuery}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+    </div>
   );
 };
+
+export default ProjectsPage;
