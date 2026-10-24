@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Heart, Compass, Cpu, Gamepad2 } from 'lucide-react';
 import { StaggerContainer, StaggerItem } from '../components/motion/StaggerGroup';
 import { LiquidGlassReveal } from '../components/motion/LiquidGlassReveal';
+import ReflectiveCard from '../components/ui/ReflectiveCard';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CheckmarkBadge01Icon, FingerPrintIcon } from '@hugeicons/core-free-icons';
 
 export const AboutPage: React.FC = () => {
   const milestones = [
@@ -39,18 +42,83 @@ export const AboutPage: React.FC = () => {
         </p>
       </StaggerItem>
 
-      {/* Main Glass Profile Card with Liquid Reveal */}
+      {/* Main Glass Profile Card with Reflective Card & Liquid Reveal */}
       <StaggerItem>
         <LiquidGlassReveal variant="sage">
-          <section className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center glass-panel rounded-3xl p-8 sm:p-10 shadow-lg">
-            <div className="md:col-span-5 relative aspect-square rounded-2xl overflow-hidden glass-panel-subtle shadow-md">
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop"
-                alt="Portrait of the creator"
-                className="w-full h-full object-cover"
-              />
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center glass-panel rounded-3xl p-6 sm:p-10 shadow-lg">
+            {/* Interactive 3D Reflective Card with Profile Photo */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-center">
+              <ReflectiveCard
+                theme="dark"
+                tint="#ffffff"
+                metalness={0.95}
+                roughness={0.22}
+                blurStrength={6}
+                shine={1.2}
+                glare={0.65}
+                tiltStrength={15}
+                width="100%"
+                height={500}
+                radius={24}
+                className="w-full max-w-[340px] shadow-2xl mx-auto"
+              >
+                <div className="flex flex-col h-full justify-between select-none">
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/15 shadow-sm">
+                      <HugeiconsIcon icon={CheckmarkBadge01Icon} size={15} strokeWidth={2} className="text-emerald-400" />
+                      Verified Creator
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-white/80 text-xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      Active
+                    </span>
+                  </div>
+
+                  {/* Profile Photo Display */}
+                  <div className="relative my-3 w-full flex-1 min-h-[270px] rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-black/40 group">
+                    <img
+                      src="/profile.webp"
+                      alt="Pacharaphum Maruek"
+                      className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 backdrop-blur-sm mb-1">
+                        IT Student &amp; Developer
+                      </span>
+                      <h3 className="text-lg font-bold tracking-tight text-white drop-shadow-md">
+                        Pacharaphum Maruek
+                      </h3>
+                      <p className="text-xs text-white/70 line-clamp-1">
+                        Nakhon Si Thammarat Technical College
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Card Footer */}
+                  <div className="flex items-end justify-between gap-3 pt-2 border-t border-white/10">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-white/50">
+                        Digital ID
+                      </span>
+                      <span className="text-xs font-mono tracking-wider text-white/90">
+                        NTC-IT-2026-DEV
+                      </span>
+                    </div>
+                    <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-white/80 shadow-inner">
+                      <HugeiconsIcon icon={FingerPrintIcon} size={20} strokeWidth={1.8} />
+                    </div>
+                  </div>
+                </div>
+              </ReflectiveCard>
+              <p className="mt-3 text-xs text-[#746F64]/80 flex items-center gap-1.5 text-center">
+                <Sparkles className="w-3.5 h-3.5 text-[#355746]" />
+                Interactive 3D Card • Hover / Touch to Tilt &amp; Reflect
+              </p>
             </div>
-            <div className="md:col-span-7 space-y-4">
+
+            <div className="lg:col-span-7 space-y-4">
               <h2 className="text-2xl font-bold text-[#243D32]">
                 Creative Philosophy
               </h2>
