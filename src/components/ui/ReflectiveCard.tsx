@@ -4,7 +4,43 @@ import { CheckmarkBadge01Icon, FingerPrintIcon } from '@hugeicons/core-free-icon
 
 import './ReflectiveCard.css';
 
-const THEMES: Record<'dark' | 'light', Record<string, string>> = {
+const THEMES: Record<'dark' | 'light' | 'forest' | 'earth' | 'cream', Record<string, string>> = {
+  cream: {
+    '--rc-base': '#F3EBDD',
+    '--rc-shadow': '0 24px 48px -20px rgba(36, 61, 50, 0.16), 0 8px 24px -10px rgba(36, 61, 50, 0.1)',
+    '--rc-ink': '#243D32',
+    '--rc-muted': 'rgba(116, 111, 100, 0.85)',
+    '--rc-tile': 'linear-gradient(180deg, #FAF8F2 0%, #EAE0CF 100%)',
+    '--rc-tile-edge': 'rgba(217, 200, 170, 0.45)',
+    '--rc-tile-highlight': 'rgba(255, 255, 255, 0.85)',
+    '--rc-tile-shadow': '0 4px 10px -4px rgba(36, 61, 50, 0.12)',
+    '--rc-rim': 'rgba(217, 200, 170, 0.55)',
+    '--rc-rim-highlight': 'rgba(255, 255, 255, 0.95)'
+  },
+  forest: {
+    '--rc-base': '#13241B',
+    '--rc-shadow': '0 26px 50px -18px rgba(12, 28, 20, 0.55), 0 8px 24px -10px rgba(12, 28, 20, 0.35)',
+    '--rc-ink': '#FAF8F2',
+    '--rc-muted': 'rgba(217, 200, 170, 0.85)',
+    '--rc-tile': 'linear-gradient(180deg, #233e30 0%, #13241B 100%)',
+    '--rc-tile-edge': 'rgba(217, 200, 170, 0.25)',
+    '--rc-tile-highlight': 'rgba(255, 255, 255, 0.2)',
+    '--rc-tile-shadow': '0 4px 12px -4px rgba(8, 20, 14, 0.6)',
+    '--rc-rim': 'rgba(130, 151, 123, 0.4)',
+    '--rc-rim-highlight': 'rgba(217, 200, 170, 0.45)'
+  },
+  earth: {
+    '--rc-base': '#243D32',
+    '--rc-shadow': '0 24px 48px -20px rgba(36, 61, 50, 0.4), 0 8px 20px -8px rgba(36, 61, 50, 0.25)',
+    '--rc-ink': '#FAF8F2',
+    '--rc-muted': 'rgba(243, 235, 221, 0.7)',
+    '--rc-tile': 'linear-gradient(180deg, #355746 0%, #243D32 100%)',
+    '--rc-tile-edge': 'rgba(217, 200, 170, 0.2)',
+    '--rc-tile-highlight': 'rgba(255, 255, 255, 0.2)',
+    '--rc-tile-shadow': '0 4px 10px -4px rgba(20, 38, 30, 0.5)',
+    '--rc-rim': 'rgba(217, 200, 170, 0.3)',
+    '--rc-rim-highlight': 'rgba(255, 255, 255, 0.3)'
+  },
   dark: {
     '--rc-base': '#1d1c22',
     '--rc-shadow': '0 22px 44px -20px rgba(0, 0, 0, 0.8), 0 6px 16px -8px rgba(0, 0, 0, 0.5)',
@@ -633,7 +669,7 @@ export interface ReflectiveCardProps {
   idLabel?: string;
   idValue?: string;
   children?: ReactNode;
-  theme?: 'dark' | 'light';
+  theme?: 'dark' | 'light' | 'forest' | 'earth' | 'cream';
   videoSrc?: string;
   webcam?: boolean;
   onWebcamError?: (error: Error) => void;
@@ -698,7 +734,7 @@ const ReflectiveCard = ({
   const errorRef = useRef(onWebcamError);
   const [generation, setGeneration] = useState(0);
 
-  const palette = theme === 'light' ? 'light' : 'dark';
+  const palette = theme === 'light' ? 'light' : theme === 'cream' ? 'cream' : theme === 'earth' ? 'earth' : theme === 'forest' ? 'forest' : 'dark';
   const settings: InternalSettings = {
     tint: parseColor(tint).map(channel => Math.pow(channel, 2.2)),
     metalness: clamp(metalness, 0, 1),
@@ -713,7 +749,7 @@ const ReflectiveCard = ({
     enableTilt,
     tiltStrength: clamp(tiltStrength, 0, 30),
     radius: Math.max(0, radius),
-    theme: palette === 'light' ? 1 : 0,
+    theme: (palette === 'light' || palette === 'cream') ? 1 : 0,
     intro
   };
   const settingsRef = useRef(settings);

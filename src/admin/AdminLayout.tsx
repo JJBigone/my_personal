@@ -33,8 +33,8 @@ export const AdminLayout: React.FC = () => {
 
   const adminNav = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-    { name: 'Projects', path: '/admin/projects', icon: FolderKanban },
-    { name: 'New Project', path: '/admin/projects/new', icon: PlusCircle },
+    { name: 'Workshops', path: '/admin/projects', icon: FolderKanban },
+    { name: 'New Workshop', path: '/admin/projects/new', icon: PlusCircle },
     { name: 'Messages', path: '/admin/messages', icon: MessageSquare },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];

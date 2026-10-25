@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
 import Hero12, { type Hero12Props } from '@/components/ui/hero-12';
@@ -54,7 +54,7 @@ const HERO_VALUES: Hero12Props = {
   animation: "subtle",
   primaryCTA: {
     ctaEnabled: true,
-    text: "Explore Projects",
+    text: "Explore Workshops",
     link: "/projects",
     size: "lg",
   },
@@ -114,8 +114,8 @@ export const HomePage: React.FC = () => {
       {/* Fullscreen Hero12 Section with Floating Navbar */}
       <Hero12 {...HERO_VALUES} />
 
-      {/* Full-width Edge-to-Edge Cylindrical 3D Showcase (Selected Works / Featured Projects) */}
-      <section className="relative w-full border-t border-b border-[#D9C8AA]/30 overflow-hidden bg-gradient-to-b from-[#FAF8F2] via-[#F3EBDD]/40 to-[#FAF8F2]">
+      {/* Full-width Edge-to-Edge Cylindrical 3D Showcase */}
+      <section className="relative w-full border-t border-[#D9C8AA]/35 overflow-hidden bg-gradient-to-b from-[#FAF8F2] via-[#F3EBDD]/25 to-[#F3EBDD]/40">
         {/* Subtle background mesh grid */}
         <div
           aria-hidden="true"
@@ -135,33 +135,33 @@ export const HomePage: React.FC = () => {
           axis={54}
           curve={78}
           fade={12}
-          className="h-[640px] sm:h-[720px] lg:h-[780px] w-full"
+          className="h-[580px] sm:h-[660px] lg:h-[700px] w-full"
         >
-          <div className="relative z-10 flex h-full flex-col items-center justify-between py-14 sm:py-16 text-center pointer-events-none">
+          <div className="relative z-10 flex h-full flex-col items-center justify-between pt-12 sm:pt-14 pb-6 sm:pb-8 text-center pointer-events-none">
             {/* Header Content */}
             <div className="px-6 pointer-events-auto max-w-3xl space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAF8F2]/90 backdrop-blur-md border border-[#D9C8AA]/60 text-xs font-semibold uppercase tracking-wider text-[#355746] shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-[#80634D]" />
-                <span>Selected Works · Featured Projects</span>
-              </div>
-              <h2 className="text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#243D32] drop-shadow-sm">
-                Every project,
+              <h2 className="text-balance text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#243D32] drop-shadow-sm leading-snug">
+                ชิ้นงานทั้งหมด
                 <br />
-                brought into focus.
+                <span className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#355746] block mt-2 sm:mt-3">
+                  รายวิชาการวิเคราะห์และออกแบบระบบเชิงวัตถุ
+                </span>
               </h2>
             </div>
 
             {/* Bottom Callout & Action */}
-            <div className="px-6 pointer-events-auto space-y-4 max-w-xl">
-              <p className="text-balance text-xs sm:text-sm md:text-base text-[#4B382D] font-medium bg-[#FAF8F2]/85 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#D9C8AA]/50 shadow-md">
-                Stream of interactive web systems, esports portals, audio synthesizers, and creative media.
+            <div className="px-6 pointer-events-auto space-y-4 max-w-2xl">
+              <p className="text-balance text-xs sm:text-sm md:text-base text-[#4B382D] font-medium leading-relaxed bg-[#FAF8F2]/90 backdrop-blur-md px-6 py-3 rounded-2xl sm:rounded-3xl border border-[#D9C8AA]/60 shadow-md">
+                ศึกษาและออกแบบระบบสารสนเทศเชิงวัตถุ ตั้งแต่การวิเคราะห์ความต้องการ
+                <br />
+                การออกแบบ UML ไปจนถึงการพัฒนาโครงสร้างระบบที่มีประสิทธิภาพและใช้งานได้จริง
               </p>
               <div className="flex items-center justify-center gap-3">
                 <Link
                   to="/projects"
                   className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] font-bold text-sm shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746]"
                 >
-                  <span>Explore All Projects</span>
+                  <span>Explore All Workshops</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

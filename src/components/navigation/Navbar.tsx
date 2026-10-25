@@ -22,7 +22,7 @@ export const Navbar: React.FC = () => {
   const navItems = [
     { label: 'Home', href: '/', icon: <Sparkles className="w-4 h-4" /> },
     { label: 'About', href: '/about', icon: <User className="w-4 h-4" /> },
-    { label: 'Projects', href: '/projects', icon: <FolderGit2 className="w-4 h-4" /> },
+    { label: 'Workshops', href: '/projects', icon: <FolderGit2 className="w-4 h-4" /> },
     { label: 'Skills', href: '/skills', icon: <Wrench className="w-4 h-4" /> },
     { label: 'Contact', href: '/contact', icon: <Mail className="w-4 h-4" /> },
   ];

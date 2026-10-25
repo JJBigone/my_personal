@@ -179,7 +179,7 @@ export const ProjectsPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#355746] animate-pulse" />
           <span className="text-xs font-bold uppercase tracking-wider text-[#243D32]">
-            {viewMode === 'folders' ? '3D Folders' : 'All Projects'}
+            {viewMode === 'folders' ? '3D Folders' : 'All Workshops'}
           </span>
         </div>
 
@@ -240,7 +240,7 @@ export const ProjectsPage: React.FC = () => {
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF8F2] text-[#243D32] hover:bg-[#F3EBDD] font-bold text-xs shadow transition-all cursor-pointer"
               >
-                <span>View Project</span>
+                <span>View Workshop</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -380,7 +380,7 @@ export const ProjectsPage: React.FC = () => {
               <Search className="w-4 h-4 text-[#746F64] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search projects or tech..."
+                placeholder="Search workshops or tech..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 text-sm rounded-full glass-input text-[#243D32] placeholder:text-[#746F64]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746]"
@@ -398,7 +398,7 @@ export const ProjectsPage: React.FC = () => {
               </div>
             ) : filteredProjects.length === 0 ? (
               <div className="glass-panel rounded-3xl p-12 text-center space-y-3">
-                <h3 className="text-xl font-bold text-[#243D32]">No projects found</h3>
+                <h3 className="text-xl font-bold text-[#243D32]">No workshops found</h3>
                 <p className="text-sm text-[#746F64]">
                   Try searching with another keyword or selecting a different category.
                 </p>

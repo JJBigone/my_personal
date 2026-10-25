@@ -53,9 +53,9 @@ export const ProjectListPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#243D32]">Project Management</h1>
+          <h1 className="text-3xl font-extrabold text-[#243D32]">Workshop Management</h1>
           <p className="text-xs sm:text-sm text-[#746F64] mt-1">
-            Create, edit, publish, or remove projects from the public portfolio.
+            Create, edit, publish, or remove workshops from the public portfolio.
           </p>
         </div>
         <Link
@@ -63,7 +63,7 @@ export const ProjectListPage: React.FC = () => {
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] text-xs font-semibold shadow-sm transition-all"
         >
           <Plus className="w-4 h-4" />
-          <span>Create New Project</span>
+          <span>Create New Workshop</span>
         </Link>
       </div>
 

@@ -23,10 +23,7 @@ import { cn } from "@/lib/utils";
  * hands a tile its next image each time it wraps, out of sight.
  * ─────────────────────────────────────────────────────────────── */
 
-// Strips per tile. Each is a few degrees of arc, too little to read as a
-// facet; fewer starts to show corners along the top and bottom edges. A
-// tight curve wraps a tile round a wide arc, so it needs this many.
-const SLICES = 16;
+
 
 // Camera distance from the screen, as a multiple of the cylinder's radius.
 // Just past the axis, so the ends come right up to the lens and swell; much
@@ -180,7 +177,7 @@ export function TiltedGridHero({
     for (const { src } of images) new Image().src = src;
   }, [images]);
 
-  const { columns, sweep, unit, limit } =
+  const { columns, sweep, limit } =
     layout ?? measure(1200, 560, tileHeight, aspectRatio, gap, bend);
 
   // Every length is a multiple of the tile's height, which follows the
@@ -211,7 +208,6 @@ export function TiltedGridHero({
     // finished still.
     `@media(prefers-reduced-motion:reduce){.${tile}{animation-play-state:paused}}`;
 
-  const share = aspectRatio / SLICES;
   const duration = columns * speed;
   const mask = `linear-gradient(90deg,transparent,#000 ${fade}%,#000 ${
     100 - fade
@@ -266,44 +262,28 @@ export function TiltedGridHero({
                 });
               }}
             >
-              {Array.from({ length: SLICES }, (_, k) => (
-                <div
-                  key={k}
-                  className={cn(
-                    "absolute top-0 overflow-hidden bg-muted",
-                    k === 0 && "rounded-l-lg",
-                    k === SLICES - 1 && "rounded-r-lg",
-                  )}
-                  style={{
-                    // Every strip starts at the tile's centre and is turned
-                    // round the axis to its own place on the arc.
-                    left: u((aspectRatio - share) / 2),
-                    // A pixel wider than its share, so neighbouring facets
-                    // overlap and no hairline opens between them. The last
-                    // has no neighbour to cover.
-                    width:
-                      k === SLICES - 1 ? u(share) : `calc(${u(share)} + 1px)`,
-                    height: u(1),
-                    transform: turn(
-                      (aspectRatio / 2 - (k + 0.5) * share) * unit,
-                    ),
-                  }}
-                >
-                  {img ? (
-                    <img
-                      src={img.src}
-                      alt={k === 0 ? (img.alt ?? "") : ""}
-                      draggable={false}
-                      className="absolute top-0 max-w-none object-cover"
-                      style={{
-                        left: u(-k * share),
-                        width: u(aspectRatio),
-                        height: u(1),
-                      }}
-                    />
-                  ) : null}
-                </div>
-              ))}
+              <div
+                className="w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-[#D9C8AA]/30 bg-[#16281F] relative group"
+                style={{
+                  transform: "translateZ(0)",
+                  backfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
+                }}
+              >
+                {img ? (
+                  <img
+                    src={img.src}
+                    alt={img.alt ?? ""}
+                    draggable={false}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                    style={{
+                      backfaceVisibility: "hidden",
+                      WebkitBackfaceVisibility: "hidden",
+                    }}
+                  />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+              </div>
             </div>
           );
         })}

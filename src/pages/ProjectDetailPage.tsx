@@ -37,16 +37,16 @@ export const ProjectDetailPage: React.FC = () => {
   if (!project) {
     return (
       <div className="glass-panel rounded-3xl p-12 text-center space-y-4 max-w-md mx-auto my-24">
-        <h2 className="text-2xl font-bold text-[#243D32]">Project Not Found</h2>
+        <h2 className="text-2xl font-bold text-[#243D32]">Workshop Not Found</h2>
         <p className="text-sm text-[#746F64]">
-          The requested project might have been moved, unpublished, or doesn't exist.
+          The requested workshop might have been moved, unpublished, or doesn't exist.
         </p>
         <Link
           to="/projects"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#355746] text-[#FAF8F2] text-sm font-semibold"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Projects</span>
+          <span>Back to Workshops</span>
         </Link>
       </div>
     );
@@ -62,7 +62,7 @@ export const ProjectDetailPage: React.FC = () => {
             className="inline-flex items-center gap-2 text-sm font-medium text-[#4B382D] hover:text-[#243D32] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746] rounded-full px-3 py-1 -ml-3"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to All Projects</span>
+            <span>Back to All Workshops</span>
           </Link>
         </StaggerItem>
 
@@ -171,7 +171,7 @@ export const ProjectDetailPage: React.FC = () => {
 
         {/* Detailed Description */}
         <StaggerItem className="space-y-6">
-          <h2 className="text-2xl font-bold text-[#243D32]">Project Overview &amp; Execution</h2>
+          <h2 className="text-2xl font-bold text-[#243D32]">Workshop Overview &amp; Execution</h2>
           <div className="glass-panel rounded-3xl p-8 space-y-4 text-[#4B382D] leading-relaxed text-base whitespace-pre-line">
             {project.description || project.short_description}
           </div>
