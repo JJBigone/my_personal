@@ -18,6 +18,9 @@ export const ProjectsPage: React.FC = () => {
   const toastRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // If the cache contains legacy initial mock data, clear it so user starts fresh
+    localStorage.removeItem('portfolio_custom_projects');
+
     portfolioService.getPublishedProjects().then((data) => {
       setProjects(data);
       setLoading(false);
@@ -87,80 +90,61 @@ export const ProjectsPage: React.FC = () => {
     }
   };
 
-  // Data for 3D Folders
-  const reactBitsWebApps: FolderItem[] = [
-    {
-      title: 'AuraCraft Hub',
-      description: 'React & Supabase esports portal with real-time tournament brackets.',
-      image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop',
-      href: '/projects/auracraft-gaming-hub',
-    },
-    {
-      title: 'Nexus Telemetry',
-      description: 'Next.js real-time AI workload analytics and trace monitor.',
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop',
-      href: '/projects/nexus-telemetry-dashboard',
-    },
-    {
-      title: 'Microservices Architecture',
-      description: 'High-availability cluster specs, WebSockets & API schemas.',
-    },
-  ];
+  // Dynamic items mapped from projects data
+  const unit1Items: FolderItem[] = useMemo(() => {
+    return projects
+      .filter((p) => p.category?.includes('หน่วยการเรียนรู้ที่ 1') || p.tags?.some(t => t.includes('หน่วยการเรียนรู้ที่ 1')))
+      .map((p) => ({
+        title: p.title,
+        description: p.short_description,
+        image: p.cover_image_url,
+        href: `/projects/${p.slug}`,
+      }));
+  }, [projects]);
 
-  const reactBitsMedia: FolderItem[] = [
-    {
-      title: 'Earth & Canvas',
-      description: 'Tactile editorial magazine with fluid liquid typography.',
-      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop',
-      href: '/projects/earth-and-canvas-magazine',
-    },
-    {
-      title: 'Lumina Video',
-      description: 'Cloud video workflow tool for creators to render stream highlights.',
-      image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=800&auto=format&fit=crop',
-      href: '/projects/lumina-video-asset-manager',
-    },
-    {
-      title: 'Cinematic Grade v4',
-      description: 'DRX 3D LUT lookbook & HDR broadcast grading profiles.',
-    },
-  ];
+  const webAppItems: FolderItem[] = useMemo(() => {
+    return projects
+      .filter((p) => (p.category === 'Web App' || p.category === 'Gaming' || p.tags?.includes('Web App')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
+      .map((p) => ({
+        title: p.title,
+        description: p.short_description,
+        image: p.cover_image_url,
+        href: `/projects/${p.slug}`,
+      }));
+  }, [projects]);
 
-  const reactBitsLab: FolderItem[] = [
-    {
-      title: 'Verdant Sound',
-      description: 'Generative Web Audio synth with ambient nature loop layer.',
-      image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop',
-      href: '/projects/verdant-soundboard',
-    },
-    {
-      title: 'CyberForge 3D',
-      description: 'WebGL procedural PBR shader generator with WebGPU support.',
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
-      href: '/projects/cyberforge-3d-asset-studio',
-    },
-    {
-      title: 'Botanica Brand',
-      description: 'E-commerce lookbook celebrating sustainable organic artisans.',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop',
-      href: '/projects/botanica-organic-brand',
-    },
-  ];
+  const mediaItems: FolderItem[] = useMemo(() => {
+    return projects
+      .filter((p) => (p.category === 'Content Creation' || p.category === 'Video Editing' || p.tags?.includes('Video')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
+      .map((p) => ({
+        title: p.title,
+        description: p.short_description,
+        image: p.cover_image_url,
+        href: `/projects/${p.slug}`,
+      }));
+  }, [projects]);
 
-  const reactBitsArchives: FolderItem[] = [
-    {
-      title: 'NSTTC Thesis 2026',
-      description: 'Software engineering & interactive web systems capstone dissertation.',
-    },
-    {
-      title: 'Performance Audit',
-      description: 'Lighthouse 100/100 Core Web Vitals optimization audit.',
-    },
-    {
-      title: 'Client Contract SOW',
-      description: 'Scope of work template, SLA guidelines, and commercial roadmap.',
-    },
-  ];
+  const labItems: FolderItem[] = useMemo(() => {
+    return projects
+      .filter((p) => (p.category === 'Audio Engineering' || p.category === '3D Design' || p.tags?.includes('Audio') || p.tags?.includes('3D')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
+      .map((p) => ({
+        title: p.title,
+        description: p.short_description,
+        image: p.cover_image_url,
+        href: `/projects/${p.slug}`,
+      }));
+  }, [projects]);
+
+  const archiveItems: FolderItem[] = useMemo(() => {
+    return projects
+      .filter((p) => (p.category === 'Documentation' || p.category === 'Research' || p.tags?.includes('Docs')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
+      .map((p) => ({
+        title: p.title,
+        description: p.short_description,
+        image: p.cover_image_url,
+        href: `/projects/${p.slug}`,
+      }));
+  }, [projects]);
 
   return (
     <div className="w-full min-h-screen pt-24 pb-16 px-4 sm:px-8 xl:px-12 flex flex-col items-center relative overflow-visible">
@@ -257,6 +241,17 @@ export const ProjectsPage: React.FC = () => {
 
       {/* Mode 1: 3D Folders (Full Width & Clean) */}
       {viewMode === 'folders' ? (
+        projects.length === 0 && !loading ? (
+          <div className="w-full max-w-2xl mx-auto my-auto py-16 px-6 text-center glass-panel rounded-3xl space-y-4 border border-[#82977B]/30 shadow-lg">
+            <div className="w-16 h-16 rounded-2xl bg-[#355746]/10 border border-[#355746]/20 flex items-center justify-center mx-auto text-[#355746]">
+              <Layers className="w-8 h-8 opacity-75" />
+            </div>
+            <h3 className="text-xl font-bold text-[#243D32]">ยังไม่มีผลงานในระบบ</h3>
+            <p className="text-sm text-[#746F64] max-w-md mx-auto">
+              ผลงานตัวอย่างถูกนำออกเรียบร้อยแล้ว คุณสามารถเข้าสู่ระบบ Admin เพื่อเพิ่มผลงานจริงได้ในภายหลัง
+            </p>
+          </div>
+        ) : (
         <div
           className="w-full max-w-[1600px] flex-1 flex flex-col justify-center items-center py-8 my-auto"
           onClick={(e) => {
@@ -266,10 +261,10 @@ export const ProjectsPage: React.FC = () => {
           }}
         >
           <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 sm:gap-x-8 lg:gap-x-10 xl:gap-x-12 gap-y-16 items-end justify-items-center">
-            {/* 1. Web Apps (Forest Green: #355746) */}
+            {/* 1. การพัฒนาระบบสารสนเทศ หน่วยการเรียนรู้ที่ 1 */}
             <div className="flex flex-col items-center relative transition-all duration-300">
               <Folder
-                label="Web Apps"
+                label="การพัฒนาระบบสารสนเทศ หน่วยการเรียนรู้ที่ 1"
                 mode="flap"
                 variant="solid"
                 color="#355746"
@@ -277,12 +272,15 @@ export const ProjectsPage: React.FC = () => {
                 theme="light"
                 size={1.12}
                 draggable={false}
-                items={reactBitsWebApps}
+                items={unit1Items}
                 onItemClick={handleFolderItemClick}
               />
-              <div className="mt-7 text-center">
-                <span className="text-sm font-extrabold text-[#355746] uppercase tracking-wider block">
-                  WEB &amp; FULLSTACK
+              <div className="mt-7 text-center max-w-[260px]">
+                <span className="text-xs sm:text-sm font-extrabold text-[#355746] tracking-wide block leading-snug">
+                  การพัฒนาระบบสารสนเทศ
+                </span>
+                <span className="text-[11px] font-bold text-[#80634D] block mt-0.5">
+                  หน่วยการเรียนรู้ที่ 1
                 </span>
               </div>
             </div>
@@ -298,7 +296,7 @@ export const ProjectsPage: React.FC = () => {
                 theme="light"
                 size={1.12}
                 draggable={false}
-                items={reactBitsMedia}
+                items={mediaItems}
                 onItemClick={handleFolderItemClick}
               />
               <div className="mt-7 text-center">
@@ -319,7 +317,7 @@ export const ProjectsPage: React.FC = () => {
                 theme="light"
                 size={1.12}
                 draggable={false}
-                items={reactBitsLab}
+                items={labItems}
                 onItemClick={handleFolderItemClick}
               />
               <div className="mt-7 text-center">
@@ -340,7 +338,7 @@ export const ProjectsPage: React.FC = () => {
                 theme="light"
                 size={1.12}
                 draggable={false}
-                items={reactBitsArchives}
+                items={archiveItems}
                 onItemClick={handleFolderItemClick}
               />
               <div className="mt-7 text-center">
@@ -351,6 +349,7 @@ export const ProjectsPage: React.FC = () => {
             </div>
           </div>
         </div>
+        )
       ) : (
         /* Mode 2: Full Grid View with Search and Filter */
         <div className="w-full max-w-7xl space-y-8 py-6">
@@ -398,20 +397,26 @@ export const ProjectsPage: React.FC = () => {
               </div>
             ) : filteredProjects.length === 0 ? (
               <div className="glass-panel rounded-3xl p-12 text-center space-y-3">
-                <h3 className="text-xl font-bold text-[#243D32]">No workshops found</h3>
+                <h3 className="text-xl font-bold text-[#243D32]">
+                  {projects.length === 0 ? 'ยังไม่มีผลงานในระบบ' : 'ไม่พบผลงานที่ค้นหา'}
+                </h3>
                 <p className="text-sm text-[#746F64]">
-                  Try searching with another keyword or selecting a different category.
+                  {projects.length === 0
+                    ? 'ผลงานตัวอย่างถูกนำออกแล้ว สามารถเข้าสู่ระบบ Admin เพื่อเพิ่มผลงานจริงได้'
+                    : 'ลองค้นหาด้วยคำค้นอื่น หรือเลือกหมวดหมู่อื่น'}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategory('All');
-                    setSearchQuery('');
-                  }}
-                  className="mt-2 px-5 py-2 rounded-full bg-[#355746] text-[#FAF8F2] text-xs font-semibold"
-                >
-                  Reset Filters
-                </button>
+                {projects.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory('All');
+                      setSearchQuery('');
+                    }}
+                    className="mt-2 px-5 py-2 rounded-full bg-[#355746] text-[#FAF8F2] text-xs font-semibold"
+                  >
+                    Reset Filters
+                  </button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

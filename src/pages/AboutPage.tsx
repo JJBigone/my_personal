@@ -51,7 +51,7 @@ export const AboutPage: React.FC = () => {
     { label: 'อายุ', value: '19 ปี', sub: '19 เม.ย. 2550', icon: Calendar },
     { label: 'การศึกษา', value: 'ปวส. 1', sub: 'เทคโนโลยีสารสนเทศ', icon: GraduationCap },
     { label: 'รหัสนักศึกษา', value: '69319010009', sub: 'กลุ่ม 1', icon: ShieldCheck },
-    { label: 'สถาบัน', value: 'วท. นครศรีฯ', sub: 'NTC Campus', icon: School },
+    { label: 'สถาบัน', value: 'วิทยาลัยเทคนิค', sub: 'นครศรีธรรมราช', icon: School },
   ];
 
   return (
@@ -67,16 +67,9 @@ export const AboutPage: React.FC = () => {
         <StaggerItem className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-[#82977B]/25 pb-6">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#355746]/10 border border-[#82977B]/35 text-xs font-bold uppercase tracking-widest text-[#355746] backdrop-blur-md shadow-xs">
-                <Sparkles className="w-3.5 h-3.5 text-[#80634D] animate-spin" style={{ animationDuration: '10s' }} />
-                <span>Verified Academic & Developer Profile</span>
-              </div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#243D32] tracking-tight">
                 About Me
               </h1>
-              <p className="text-sm sm:text-base text-[#746F64] max-w-2xl leading-relaxed">
-                มุ่งมั่นศึกษาและพัฒนาระบบสารสนเทศ ผสานหลักการวิเคราะห์ออกแบบเชิงวัตถุ (OOAD) และการสร้างสรรค์เว็บแอปพลิเคชันที่ตอบโจทย์การใช้งานจริง
-              </p>
             </div>
 
             <div className="flex items-center gap-3">

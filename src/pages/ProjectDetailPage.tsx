@@ -103,7 +103,13 @@ export const ProjectDetailPage: React.FC = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] text-sm font-semibold shadow-md transition-all hover:scale-105 active:scale-95"
               >
-                <span>Live Demonstration</span>
+                <span>
+                  {project.project_url.endsWith('.pdf')
+                    ? 'เปิดดูเอกสาร PDF'
+                    : project.project_url.match(/\.(png|jpg|jpeg|webp)$/i)
+                    ? 'เปิดดูรูปภาพต้นฉบับ'
+                    : 'Live Demonstration'}
+                </span>
                 <ExternalLink className="w-4 h-4" />
               </a>
             )}
