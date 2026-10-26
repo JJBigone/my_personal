@@ -1,9 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
-import { ArrowLeft, ExternalLink, Sparkles, Calendar, Tag, ShieldCheck } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  ExternalLink, 
+  Sparkles, 
+  Calendar, 
+  Tag, 
+  ShieldCheck, 
+  ChevronLeft, 
+  ChevronRight, 
+  Maximize2, 
+  Minimize2,
+  Download,
+  Layers
+} from 'lucide-react';
 import { StaggerContainer, StaggerItem } from '../components/motion/StaggerGroup';
 
 export const ProjectDetailPage: React.FC = () => {
@@ -13,6 +26,10 @@ export const ProjectDetailPage: React.FC = () => {
 
   const [project, setProject] = useState<Project | null>(initialProject || null);
   const [loading, setLoading] = useState(!initialProject);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const slideContainerRef = useRef<HTMLDivElement>(null);
+  const thumbnailsRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = Boolean(useReducedMotion());
 
   useEffect(() => {
@@ -23,6 +40,50 @@ export const ProjectDetailPage: React.FC = () => {
       });
     }
   }, [slug]);
+
+  // Slide navigation
+  const slides = project?.gallery_images || [];
+  const totalSlides = slides.length;
+
+  const goToPrevSlide = useCallback(() => {
+    setCurrentSlideIndex((prev) => (prev > 0 ? prev - 1 : totalSlides - 1));
+  }, [totalSlides]);
+
+  const goToNextSlide = useCallback(() => {
+    setCurrentSlideIndex((prev) => (prev < totalSlides - 1 ? prev + 1 : 0));
+  }, [totalSlides]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (totalSlides === 0) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        goToPrevSlide();
+      } else if (e.key === 'ArrowRight') {
+        goToNextSlide();
+      } else if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [totalSlides, goToPrevSlide, goToNextSlide, isFullscreen]);
+
+  // Scroll active thumbnail into view
+  useEffect(() => {
+    if (thumbnailsRef.current) {
+      const activeThumb = thumbnailsRef.current.children[currentSlideIndex] as HTMLElement;
+      if (activeThumb) {
+        activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [currentSlideIndex]);
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
 
   if (loading) {
     return (
@@ -52,8 +113,10 @@ export const ProjectDetailPage: React.FC = () => {
     );
   }
 
+  const isSlidePresentation = totalSlides > 0;
+
   return (
-    <article className="max-w-4xl mx-auto w-full pt-28 pb-16 px-4 sm:px-8">
+    <article className="max-w-5xl mx-auto w-full pt-28 pb-16 px-4 sm:px-8">
       <StaggerContainer className="space-y-12">
         {/* Back button */}
         <StaggerItem subtle>
@@ -84,9 +147,15 @@ export const ProjectDetailPage: React.FC = () => {
                 <span>Admin Preview (Draft)</span>
               </span>
             )}
+            {isSlidePresentation && (
+              <span className="flex items-center gap-1.5 bg-[#355746]/10 text-[#355746] border border-[#355746]/20 px-3 py-1 rounded-full text-xs font-semibold">
+                <Layers className="w-3.5 h-3.5" />
+                <span>สไลด์นำเสนอ {totalSlides} หน้า (กดดูได้ทีละหน้า)</span>
+              </span>
+            )}
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-[#243D32] tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-[#243D32] tracking-tight leading-tight">
             {project.title}
           </h1>
 
@@ -96,6 +165,16 @@ export const ProjectDetailPage: React.FC = () => {
 
           {/* Action Links */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
+            {project.source_code_url && project.source_code_url.endsWith('.pptx') && (
+              <a
+                href={project.source_code_url}
+                download
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#D04423] hover:bg-[#B33517] text-white text-sm font-semibold shadow-lg transition-all hover:scale-105 active:scale-95"
+              >
+                <Download className="w-4 h-4" />
+                <span>ดาวน์โหลด PowerPoint (.pptx)</span>
+              </a>
+            )}
             {project.project_url && (
               <a
                 href={project.project_url}
@@ -105,7 +184,7 @@ export const ProjectDetailPage: React.FC = () => {
               >
                 <span>
                   {project.project_url.endsWith('.pdf')
-                    ? 'เปิดดูเอกสาร PDF'
+                    ? 'เปิดดูเอกสาร PDF เต็มจอ'
                     : project.project_url.match(/\.(png|jpg|jpeg|webp)$/i)
                     ? 'เปิดดูรูปภาพต้นฉบับ'
                     : 'Live Demonstration'}
@@ -113,25 +192,154 @@ export const ProjectDetailPage: React.FC = () => {
                 <ExternalLink className="w-4 h-4" />
               </a>
             )}
-            {project.source_code_url && (
-              <a
-                href={project.source_code_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full glass-panel hover:bg-[#FAF8F2] text-[#243D32] text-sm font-semibold transition-all"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                </svg>
-                <span>Source Repository</span>
-              </a>
-            )}
           </div>
         </StaggerItem>
 
-        {/* Media / Document Preview: Full Image View or Embedded Multi-Page PDF Viewer */}
+        {/* Media / Slide Presentation Viewer */}
         <StaggerItem className="space-y-6">
-          {project.project_url?.endsWith('.pdf') ? (
+          {isSlidePresentation ? (
+            <div 
+              ref={slideContainerRef}
+              className={`w-full rounded-3xl overflow-hidden glass-panel p-4 sm:p-6 shadow-2xl bg-gradient-to-br from-[#FAF8F2] via-white to-[#EAE4D7] border border-[#82977B]/30 flex flex-col items-center transition-all ${
+                isFullscreen 
+                  ? 'fixed inset-0 z-50 rounded-none p-4 sm:p-8 bg-black/95 max-w-none flex flex-col justify-between' 
+                  : ''
+              }`}
+            >
+              {/* Slide Controller Bar */}
+              <div className="w-full flex items-center justify-between pb-3 sm:pb-4 border-b border-[#82977B]/20">
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs sm:text-sm font-bold px-3 py-1 rounded-full ${
+                    isFullscreen ? 'bg-white/20 text-white' : 'bg-[#355746] text-[#FAF8F2]'
+                  }`}>
+                    สไลด์ {currentSlideIndex + 1} / {totalSlides}
+                  </span>
+                  <span className={`text-xs hidden sm:inline ${
+                    isFullscreen ? 'text-neutral-300' : 'text-[#746F64]'
+                  }`}>
+                    (ใช้ปุ่มลูกศร ⬅️ ➡️ บนแป้นพิมพ์เพื่อเปลี่ยนสไลด์ได้)
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={goToPrevSlide}
+                    className={`p-2 rounded-full border transition-all active:scale-90 ${
+                      isFullscreen 
+                        ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' 
+                        : 'bg-white hover:bg-[#355746] hover:text-white text-[#355746] border-[#82977B]/30 shadow-sm'
+                    }`}
+                    title="สไลด์ก่อนหน้า (Arrow Left)"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goToNextSlide}
+                    className={`p-2 rounded-full border transition-all active:scale-90 ${
+                      isFullscreen 
+                        ? 'bg-white/10 hover:bg-white/20 text-white border-white/20' 
+                        : 'bg-white hover:bg-[#355746] hover:text-white text-[#355746] border-[#82977B]/30 shadow-sm'
+                    }`}
+                    title="สไลด์ถัดไป (Arrow Right)"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={toggleFullscreen}
+                    className={`p-2 rounded-full border transition-all active:scale-90 ${
+                      isFullscreen 
+                        ? 'bg-white/20 hover:bg-white/30 text-white border-white/30' 
+                        : 'bg-white hover:bg-[#80634D] hover:text-white text-[#80634D] border-[#82977B]/30 shadow-sm'
+                    }`}
+                    title={isFullscreen ? 'ย่อหน้าต่าง (Esc)' : 'ขยายเต็มหน้าจอ'}
+                  >
+                    {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Main Slide Display with Animated Transition */}
+              <div className="relative w-full flex-1 flex items-center justify-center my-4 overflow-hidden rounded-2xl min-h-[300px] sm:min-h-[500px]">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={currentSlideIndex}
+                    src={slides[currentSlideIndex]}
+                    alt={`${project.title} - สไลด์ที่ ${currentSlideIndex + 1}`}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    className={`w-full max-h-[75vh] object-contain rounded-xl drop-shadow-2xl select-none ${
+                      isFullscreen ? 'max-h-[80vh]' : ''
+                    }`}
+                  />
+                </AnimatePresence>
+
+                {/* Overlay Navigation Buttons on image for easy touch/click */}
+                <button
+                  type="button"
+                  onClick={goToPrevSlide}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md transition-all opacity-70 hover:opacity-100 hover:scale-110 active:scale-95"
+                  aria-label="Previous Slide"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={goToNextSlide}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md transition-all opacity-70 hover:opacity-100 hover:scale-110 active:scale-95"
+                  aria-label="Next Slide"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-[#82977B]/20 h-1.5 rounded-full overflow-hidden mb-3">
+                <div 
+                  className="bg-[#355746] h-full transition-all duration-300"
+                  style={{ width: `${((currentSlideIndex + 1) / totalSlides) * 100}%` }}
+                />
+              </div>
+
+              {/* Slide Thumbnail Strip */}
+              <div 
+                ref={thumbnailsRef}
+                className="w-full flex items-center gap-2.5 overflow-x-auto py-2 px-1 scrollbar-thin scrollbar-thumb-[#82977B]/40"
+              >
+                {slides.map((slideSrc, idx) => {
+                  const isActive = idx === currentSlideIndex;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setCurrentSlideIndex(idx)}
+                      className={`relative flex-shrink-0 w-20 sm:w-28 aspect-video rounded-lg overflow-hidden border-2 transition-all ${
+                        isActive 
+                          ? 'border-[#355746] scale-105 shadow-md ring-2 ring-[#355746]/40' 
+                          : 'border-transparent opacity-60 hover:opacity-100 hover:border-[#82977B]/50'
+                      }`}
+                    >
+                      <img 
+                        src={slideSrc} 
+                        alt={`หน้า ${idx + 1}`}
+                        className="w-full h-full object-cover" 
+                        loading="lazy"
+                      />
+                      <span className={`absolute bottom-0.5 right-0.5 text-[9px] font-bold px-1 rounded ${
+                        isActive ? 'bg-[#355746] text-white' : 'bg-black/70 text-white'
+                      }`}>
+                        {idx + 1}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : project.project_url?.endsWith('.pdf') ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
                 <span className="text-sm font-bold text-[#355746] flex items-center gap-2">

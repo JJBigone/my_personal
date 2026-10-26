@@ -5,12 +5,25 @@ import { INITIAL_PROJECTS } from '../data/initialProjects';
 const LOCAL_STORAGE_PROJECTS_KEY = 'portfolio_custom_projects';
 const LOCAL_STORAGE_MESSAGES_KEY = 'portfolio_contact_messages';
 
-// Helper to get local override projects (used when Supabase table isn't migrated yet or offline)
 function getLocalProjects(): Project[] {
   try {
     const stored = localStorage.getItem(LOCAL_STORAGE_PROJECTS_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const parsed: Project[] = JSON.parse(stored);
+      // Ensure existing initial projects get the updated cover, gallery_images, and URLs
+      return parsed.map((p) => {
+        const initial = INITIAL_PROJECTS.find((init) => init.id === p.id);
+        if (initial) {
+          return {
+            ...p,
+            cover_image_url: initial.cover_image_url,
+            gallery_images: initial.gallery_images,
+            project_url: initial.project_url,
+            source_code_url: initial.source_code_url,
+          };
+        }
+        return p;
+      });
     }
   } catch (e) {
     console.error('Failed to parse local projects', e);

@@ -77,23 +77,6 @@ export const ProjectsPage: React.FC = () => {
     });
   }, [projects, selectedCategory, searchQuery]);
 
-  // Handle clicking on an item inside 3D Folder
-  const handleFolderItemClick = (item: FolderItem | null) => {
-    if (!item) {
-      setActiveItemToast(null);
-      return;
-    }
-    if (typeof item === 'object' && item !== null && 'title' in item) {
-      if (item.href) {
-        navigate(item.href);
-      } else {
-        setActiveItemToast({
-          title: item.title || 'Selected Project',
-          href: item.href,
-        });
-      }
-    }
-  };
 
   // Dynamic items mapped from projects data
   const unit1Items: FolderItem[] = useMemo(() => {
@@ -227,7 +210,14 @@ export const ProjectsPage: React.FC = () => {
         >
           <div className="w-full flex justify-center items-center py-10">
             {/* 1. การพัฒนาระบบสารสนเทศ หน่วยการเรียนรู้ที่ 1 */}
-            <div className="flex flex-col items-center relative transition-all duration-300">
+            <div 
+              className="flex flex-col items-center relative transition-all duration-300 cursor-pointer group"
+              onClick={() => {
+                setSelectedCategory('All');
+                setSearchQuery('');
+                setViewMode('grid');
+              }}
+            >
               <Folder
                 label="การพัฒนาระบบสารสนเทศ หน่วยการเรียนรู้ที่ 1"
                 mode="flap"
@@ -238,11 +228,15 @@ export const ProjectsPage: React.FC = () => {
                 size={1.25}
                 draggable={false}
                 items={unit1Items}
-                onItemClick={handleFolderItemClick}
+                onItemClick={() => {
+                  setSelectedCategory('All');
+                  setSearchQuery('');
+                  setViewMode('grid');
+                }}
               />
               <div className="mt-8 text-center max-w-[340px] space-y-3">
                 <div>
-                  <span className="text-lg sm:text-xl font-black text-[#355746] tracking-wide block leading-snug">
+                  <span className="text-lg sm:text-xl font-black text-[#355746] tracking-wide block leading-snug group-hover:text-[#243D32] transition-colors">
                     การพัฒนาระบบสารสนเทศ
                   </span>
                   <span className="text-xs sm:text-sm font-bold text-[#80634D] block mt-1">
@@ -252,11 +246,16 @@ export const ProjectsPage: React.FC = () => {
                 
                 <button
                   type="button"
-                  onClick={() => setIsFolderModalOpen(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedCategory('All');
+                    setSearchQuery('');
+                    setViewMode('grid');
+                  }}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                 >
-                  <Layers className="w-4 h-4 text-[#D9C8AA]" />
-                  <span>เปิดดูผลงานทั้งหมดในโฟลเดอร์ ({unit1Items.length} ชิ้น)</span>
+                  <LayoutGrid className="w-4 h-4 text-[#D9C8AA]" />
+                  <span>เปิดดูในมุมมอง Grid ({unit1Items.length} ชิ้น)</span>
                 </button>
               </div>
             </div>
