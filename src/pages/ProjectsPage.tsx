@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
 import { ProjectCard } from '../components/projects/ProjectCard';
@@ -8,7 +8,21 @@ import { Sparkles, ArrowRight, Layers, LayoutGrid, Search, Filter, X, FileText }
 
 export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<'folders' | 'grid'>('folders');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Read initial view mode from URL param (?view=grid) or fallback to sessionStorage / default
+  const [viewMode, setViewMode] = useState<'folders' | 'grid'>(() => {
+    const urlView = searchParams.get('view');
+    if (urlView === 'grid' || urlView === 'folders') return urlView;
+    try {
+      const saved = sessionStorage.getItem('workshops_view_mode');
+      if (saved === 'grid' || saved === 'folders') return saved;
+    } catch {
+      // ignore
+    }
+    return 'folders';
+  });
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -17,6 +31,44 @@ export const ProjectsPage: React.FC = () => {
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
 
   const toastRef = useRef<HTMLDivElement>(null);
+
+  // Sync viewMode changes to URL and sessionStorage
+  const handleViewModeChange = useCallback((mode: 'folders' | 'grid') => {
+    setViewMode(mode);
+    try {
+      sessionStorage.setItem('workshops_view_mode', mode);
+    } catch {
+      // ignore
+    }
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('view', mode);
+        return next;
+      },
+      { replace: true }
+    );
+  }, [setSearchParams]);
+
+  // Sync if URL search params change (e.g. user navigated back from project detail with ?view=grid)
+  useEffect(() => {
+    const urlView = searchParams.get('view');
+    if (urlView === 'grid' && viewMode !== 'grid') {
+      setViewMode('grid');
+      try {
+        sessionStorage.setItem('workshops_view_mode', 'grid');
+      } catch {
+        // ignore
+      }
+    } else if (urlView === 'folders' && viewMode !== 'folders') {
+      setViewMode('folders');
+      try {
+        sessionStorage.setItem('workshops_view_mode', 'folders');
+      } catch {
+        // ignore
+      }
+    }
+  }, [searchParams, viewMode]);
 
   useEffect(() => {
     // If the cache contains legacy initial mock data, clear it so user starts fresh
@@ -65,13 +117,21 @@ export const ProjectsPage: React.FC = () => {
 
   // Filter projects by category and search term for Grid View
   const filteredProjects = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+
     return projects.filter((project) => {
       const matchCategory = selectedCategory === 'All' || project.category === selectedCategory;
-      const matchSearch =
-        !searchQuery ||
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.short_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.technologies.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      if (!q) return matchCategory;
+
+      const titleMatch = project.title?.toLowerCase().includes(q) ?? false;
+      const shortDescMatch = project.short_description?.toLowerCase().includes(q) ?? false;
+      const descMatch = project.description?.toLowerCase().includes(q) ?? false;
+      const categoryMatch = project.category?.toLowerCase().includes(q) ?? false;
+      const tagsMatch = project.tags?.some((t) => t.toLowerCase().includes(q)) ?? false;
+      const techMatch = project.technologies?.some((t) => t.toLowerCase().includes(q)) ?? false;
+
+      const matchSearch = titleMatch || shortDescMatch || descMatch || categoryMatch || tagsMatch || techMatch;
 
       return matchCategory && matchSearch;
     });
@@ -118,7 +178,7 @@ export const ProjectsPage: React.FC = () => {
             type="button"
             onClick={() => {
               setActiveItemToast(null);
-              setViewMode('folders');
+              handleViewModeChange('folders');
             }}
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               viewMode === 'folders'
@@ -133,7 +193,7 @@ export const ProjectsPage: React.FC = () => {
             type="button"
             onClick={() => {
               setActiveItemToast(null);
-              setViewMode('grid');
+              handleViewModeChange('grid');
             }}
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               viewMode === 'grid'
@@ -215,7 +275,7 @@ export const ProjectsPage: React.FC = () => {
               onClick={() => {
                 setSelectedCategory('All');
                 setSearchQuery('');
-                setViewMode('grid');
+                handleViewModeChange('grid');
               }}
             >
               <Folder
@@ -231,7 +291,7 @@ export const ProjectsPage: React.FC = () => {
                 onItemClick={() => {
                   setSelectedCategory('All');
                   setSearchQuery('');
-                  setViewMode('grid');
+                  handleViewModeChange('grid');
                 }}
               />
               <div className="mt-8 text-center max-w-[340px] space-y-3">
@@ -250,7 +310,7 @@ export const ProjectsPage: React.FC = () => {
                     e.stopPropagation();
                     setSelectedCategory('All');
                     setSearchQuery('');
-                    setViewMode('grid');
+                    handleViewModeChange('grid');
                   }}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                 >
@@ -286,18 +346,47 @@ export const ProjectsPage: React.FC = () => {
               ))}
             </div>
 
-            {/* Search Input */}
-            <div className="relative w-full md:w-72">
-              <Search className="w-4 h-4 text-[#746F64] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            {/* Search Input with Clear Button */}
+            <div className="relative w-full md:w-80">
+              <Search className="w-4 h-4 text-[#746F64] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search workshops or tech..."
+                placeholder="ค้นหาผลงาน, สไลด์, SDLC, เครื่องมือ..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-full glass-input text-[#243D32] placeholder:text-[#746F64]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746]"
+                className="w-full pl-9 pr-9 py-2 text-sm rounded-full glass-input text-[#243D32] placeholder:text-[#746F64]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746]"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#746F64] hover:text-[#243D32] rounded-full hover:bg-stone-200/50 transition-colors cursor-pointer"
+                  title="ล้างคำค้นหา"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </section>
+
+          {/* Search Result Feedback */}
+          {searchQuery.trim() && (
+            <div className="flex items-center justify-between px-2 text-xs text-[#746F64]">
+              <span>
+                ผลการค้นหาสำหรับ "<strong>{searchQuery.trim()}</strong>" {selectedCategory !== 'All' ? `ในหมวด ${selectedCategory}` : ''}: พบ {filteredProjects.length} ผลงาน
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('All');
+                }}
+                className="text-[#355746] font-semibold hover:underline"
+              >
+                ล้างการค้นหาทั้งหมด
+              </button>
+            </div>
+          )}
 
           {/* Projects Grid List */}
           <section>
@@ -308,27 +397,37 @@ export const ProjectsPage: React.FC = () => {
                 ))}
               </div>
             ) : filteredProjects.length === 0 ? (
-              <div className="glass-panel rounded-3xl p-12 text-center space-y-3">
+              <div className="glass-panel rounded-3xl p-12 text-center space-y-4">
                 <h3 className="text-xl font-bold text-[#243D32]">
-                  {projects.length === 0 ? 'ยังไม่มีผลงานในระบบ' : 'ไม่พบผลงานที่ค้นหา'}
+                  {projects.length === 0 ? 'ยังไม่มีผลงานในระบบ' : 'ไม่พบผลงานที่ตรงกับคำค้นหา'}
                 </h3>
-                <p className="text-sm text-[#746F64]">
+                <p className="text-sm text-[#746F64] max-w-md mx-auto">
                   {projects.length === 0
                     ? 'ผลงานตัวอย่างถูกนำออกแล้ว สามารถเข้าสู่ระบบ Admin เพื่อเพิ่มผลงานจริงได้'
-                    : 'ลองค้นหาด้วยคำค้นอื่น หรือเลือกหมวดหมู่อื่น'}
+                    : `ไม่พบผลงานที่ตรงกับ "${searchQuery.trim()}" ${
+                        selectedCategory !== 'All' ? `ในหมวดหมู่ "${selectedCategory}"` : ''
+                      }`}
                 </p>
-                {projects.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedCategory('All');
-                      setSearchQuery('');
-                    }}
-                    className="mt-2 px-5 py-2 rounded-full bg-[#355746] text-[#FAF8F2] text-xs font-semibold"
-                  >
-                    Reset Filters
-                  </button>
-                )}
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  {selectedCategory !== 'All' && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCategory('All')}
+                      className="px-5 py-2 rounded-full bg-[#FAF8F2] border border-[#355746] text-[#355746] text-xs font-semibold hover:bg-[#355746] hover:text-white transition-colors"
+                    >
+                      ค้นหาคำนี้ในทุกหมวดหมู่ (All)
+                    </button>
+                  )}
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="px-5 py-2 rounded-full bg-[#355746] text-[#FAF8F2] text-xs font-semibold hover:bg-[#243D32] transition-colors"
+                    >
+                      ล้างคำค้นหา
+                    </button>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -103,7 +103,7 @@ export const ProjectDetailPage: React.FC = () => {
           The requested workshop might have been moved, unpublished, or doesn't exist.
         </p>
         <Link
-          to="/projects"
+          to="/projects?view=grid"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#355746] text-[#FAF8F2] text-sm font-semibold"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -121,11 +121,11 @@ export const ProjectDetailPage: React.FC = () => {
         {/* Back button */}
         <StaggerItem subtle>
           <Link
-            to="/projects"
+            to="/projects?view=grid"
             className="inline-flex items-center gap-2 text-sm font-medium text-[#4B382D] hover:text-[#243D32] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355746] rounded-full px-3 py-1 -ml-3"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to All Workshops</span>
+            <span>ย้อนกลับสู่หน้ารายการผลงาน (Grid View)</span>
           </Link>
         </StaggerItem>
 
@@ -434,6 +434,17 @@ export const ProjectDetailPage: React.FC = () => {
               </span>
             ))}
           </div>
+        </StaggerItem>
+
+        {/* Bottom Back Button */}
+        <StaggerItem className="pt-6 border-t border-[#82977B]/20 flex justify-center">
+          <Link
+            to="/projects?view=grid"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>ย้อนกลับสู่หน้ารายการผลงานทั้งหมด (Grid View)</span>
+          </Link>
         </StaggerItem>
       </StaggerContainer>
     </article>
