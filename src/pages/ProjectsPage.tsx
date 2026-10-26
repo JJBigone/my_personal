@@ -4,7 +4,7 @@ import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
 import { ProjectCard } from '../components/projects/ProjectCard';
 import Folder, { type FolderItem } from '../components/ui/Folder';
-import { Sparkles, ArrowRight, Layers, LayoutGrid, Search, Filter, X, FileText, ExternalLink } from 'lucide-react';
+import { Sparkles, ArrowRight, Layers, LayoutGrid, Search, Filter, X, FileText } from 'lucide-react';
 
 export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -107,49 +107,6 @@ export const ProjectsPage: React.FC = () => {
       }));
   }, [projects]);
 
-  const webAppItems: FolderItem[] = useMemo(() => {
-    return projects
-      .filter((p) => (p.category === 'Web App' || p.category === 'Gaming' || p.tags?.includes('Web App')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
-      .map((p) => ({
-        title: p.title,
-        description: p.short_description,
-        image: p.cover_image_url,
-        href: `/projects/${p.slug}`,
-      }));
-  }, [projects]);
-
-  const mediaItems: FolderItem[] = useMemo(() => {
-    return projects
-      .filter((p) => (p.category === 'Content Creation' || p.category === 'Video Editing' || p.tags?.includes('Video')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
-      .map((p) => ({
-        title: p.title,
-        description: p.short_description,
-        image: p.cover_image_url,
-        href: `/projects/${p.slug}`,
-      }));
-  }, [projects]);
-
-  const labItems: FolderItem[] = useMemo(() => {
-    return projects
-      .filter((p) => (p.category === 'Audio Engineering' || p.category === '3D Design' || p.tags?.includes('Audio') || p.tags?.includes('3D')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
-      .map((p) => ({
-        title: p.title,
-        description: p.short_description,
-        image: p.cover_image_url,
-        href: `/projects/${p.slug}`,
-      }));
-  }, [projects]);
-
-  const archiveItems: FolderItem[] = useMemo(() => {
-    return projects
-      .filter((p) => (p.category === 'Documentation' || p.category === 'Research' || p.tags?.includes('Docs')) && !p.category?.includes('หน่วยการเรียนรู้ที่ 1'))
-      .map((p) => ({
-        title: p.title,
-        description: p.short_description,
-        image: p.cover_image_url,
-        href: `/projects/${p.slug}`,
-      }));
-  }, [projects]);
 
   return (
     <div className="w-full min-h-screen pt-24 pb-16 px-4 sm:px-8 xl:px-12 flex flex-col items-center relative overflow-visible">
