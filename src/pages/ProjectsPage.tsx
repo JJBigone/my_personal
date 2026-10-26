@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { portfolioService } from '../services/portfolioService';
 import type { Project } from '../types/portfolio';
 import { ProjectCard } from '../components/projects/ProjectCard';
 import Folder, { type FolderItem } from '../components/ui/Folder';
-import { Sparkles, ArrowRight, Layers, LayoutGrid, Search, Filter } from 'lucide-react';
+import { Sparkles, ArrowRight, Layers, LayoutGrid, Search, Filter, X, FileText, ExternalLink } from 'lucide-react';
 
 export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ export const ProjectsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeItemToast, setActiveItemToast] = useState<{ title: string; href?: string } | null>(null);
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
 
   const toastRef = useRef<HTMLDivElement>(null);
 
@@ -83,10 +84,14 @@ export const ProjectsPage: React.FC = () => {
       return;
     }
     if (typeof item === 'object' && item !== null && 'title' in item) {
-      setActiveItemToast({
-        title: item.title || 'Selected Project',
-        href: item.href,
-      });
+      if (item.href) {
+        navigate(item.href);
+      } else {
+        setActiveItemToast({
+          title: item.title || 'Selected Project',
+          href: item.href,
+        });
+      }
     }
   };
 
@@ -216,21 +221,24 @@ export const ProjectsPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             {activeItemToast.href && (
-              <button
-                type="button"
-                onClick={() => {
+              <Link
+                to={activeItemToast.href}
+                onClick={(e) => {
+                  e.stopPropagation();
                   setActiveItemToast(null);
-                  navigate(activeItemToast.href!);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF8F2] text-[#243D32] hover:bg-[#F3EBDD] font-bold text-xs shadow transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FAF8F2] text-[#243D32] hover:bg-[#F3EBDD] font-bold text-xs shadow-md transition-all cursor-pointer z-50 hover:scale-105 active:scale-95"
               >
                 <span>View Workshop</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              </Link>
             )}
             <button
               type="button"
-              onClick={() => setActiveItemToast(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveItemToast(null);
+              }}
               className="px-2.5 py-1 rounded-full text-xs text-[#FAF8F2]/70 hover:text-white transition-colors cursor-pointer"
             >
               Close
@@ -260,7 +268,7 @@ export const ProjectsPage: React.FC = () => {
             }
           }}
         >
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 sm:gap-x-8 lg:gap-x-10 xl:gap-x-12 gap-y-16 items-end justify-items-center">
+          <div className="w-full flex justify-center items-center py-10">
             {/* 1. การพัฒนาระบบสารสนเทศ หน่วยการเรียนรู้ที่ 1 */}
             <div className="flex flex-col items-center relative transition-all duration-300">
               <Folder
@@ -270,81 +278,29 @@ export const ProjectsPage: React.FC = () => {
                 color="#355746"
                 paperColor="#FAF8F2"
                 theme="light"
-                size={1.12}
+                size={1.25}
                 draggable={false}
                 items={unit1Items}
                 onItemClick={handleFolderItemClick}
               />
-              <div className="mt-7 text-center max-w-[260px]">
-                <span className="text-xs sm:text-sm font-extrabold text-[#355746] tracking-wide block leading-snug">
-                  การพัฒนาระบบสารสนเทศ
-                </span>
-                <span className="text-[11px] font-bold text-[#80634D] block mt-0.5">
-                  หน่วยการเรียนรู้ที่ 1
-                </span>
-              </div>
-            </div>
-
-            {/* 2. Media & Video (Earth Brown: #80634D) */}
-            <div className="flex flex-col items-center relative transition-all duration-300">
-              <Folder
-                label="Media & Video"
-                mode="flap"
-                variant="solid"
-                color="#80634D"
-                paperColor="#FAF8F2"
-                theme="light"
-                size={1.12}
-                draggable={false}
-                items={mediaItems}
-                onItemClick={handleFolderItemClick}
-              />
-              <div className="mt-7 text-center">
-                <span className="text-sm font-extrabold text-[#80634D] uppercase tracking-wider block">
-                  VIDEO &amp; EDITORIAL
-                </span>
-              </div>
-            </div>
-
-            {/* 3. Audio & 3D Lab (Sage Green: #82977B) */}
-            <div className="flex flex-col items-center relative transition-all duration-300">
-              <Folder
-                label="Creative Lab"
-                mode="flap"
-                variant="solid"
-                color="#82977B"
-                paperColor="#FAF8F2"
-                theme="light"
-                size={1.12}
-                draggable={false}
-                items={labItems}
-                onItemClick={handleFolderItemClick}
-              />
-              <div className="mt-7 text-center">
-                <span className="text-sm font-extrabold text-[#82977B] uppercase tracking-wider block">
-                  AUDIO &amp; WEBGL
-                </span>
-              </div>
-            </div>
-
-            {/* 4. Archives & Docs (Deep Forest: #243D32) */}
-            <div className="flex flex-col items-center relative transition-all duration-300">
-              <Folder
-                label="Archives & Docs"
-                mode="flap"
-                variant="solid"
-                color="#243D32"
-                paperColor="#F3EBDD"
-                theme="light"
-                size={1.12}
-                draggable={false}
-                items={archiveItems}
-                onItemClick={handleFolderItemClick}
-              />
-              <div className="mt-7 text-center">
-                <span className="text-sm font-extrabold text-[#243D32] uppercase tracking-wider block">
-                  SPECS &amp; REPORTS
-                </span>
+              <div className="mt-8 text-center max-w-[340px] space-y-3">
+                <div>
+                  <span className="text-lg sm:text-xl font-black text-[#355746] tracking-wide block leading-snug">
+                    การพัฒนาระบบสารสนเทศ
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold text-[#80634D] block mt-1">
+                    หน่วยการเรียนรู้ที่ 1
+                  </span>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={() => setIsFolderModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#355746] hover:bg-[#243D32] text-[#FAF8F2] font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <Layers className="w-4 h-4 text-[#D9C8AA]" />
+                  <span>เปิดดูผลงานทั้งหมดในโฟลเดอร์ ({unit1Items.length} ชิ้น)</span>
+                </button>
               </div>
             </div>
           </div>
@@ -430,6 +386,121 @@ export const ProjectsPage: React.FC = () => {
               </div>
             )}
           </section>
+        </div>
+      )}
+
+      {/* Fullscreen Folder Overview Modal */}
+      {isFolderModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setIsFolderModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-6xl max-h-[92vh] flex flex-col bg-[#FAF8F2] rounded-3xl border border-[#82977B]/40 shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-[#D9C8AA]/40 bg-white/70 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#355746] text-[#FAF8F2] flex items-center justify-center shadow-md">
+                  <Layers className="w-5 h-5 text-[#D9C8AA]" />
+                </div>
+                <div>
+                  <h2 className="text-lg sm:text-xl font-black text-[#243D32]">
+                    การพัฒนาระบบสารสนเทศ หน่วยการเรียนรู้ที่ 1
+                  </h2>
+                  <p className="text-xs text-[#746F64]">
+                    รายการเอกสารและผลงานทั้งหมด ({unit1Items.length} ชิ้น) • คลิกเพื่อเปิดดูฉบับเต็ม
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFolderModalOpen(false)}
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-[#243D32] transition-colors cursor-pointer"
+                title="ปิด"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body - Large, Clear Preview Grid */}
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {projects
+                  .filter((p) => p.category?.includes('หน่วยการเรียนรู้ที่ 1') || p.tags?.some((t) => t.includes('หน่วยการเรียนรู้ที่ 1')))
+                  .map((project) => (
+                    <div
+                      key={project.id}
+                      onClick={() => {
+                        setIsFolderModalOpen(false);
+                        navigate(`/projects/${project.slug}`);
+                      }}
+                      className="group cursor-pointer flex flex-col bg-white rounded-3xl border border-[#82977B]/30 hover:border-[#355746] shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-1"
+                    >
+                      {/* Large Thumbnail Preview */}
+                      <div className="relative aspect-video sm:aspect-16/10 bg-gradient-to-br from-[#FAF8F2] to-[#EAE4D7] p-2 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={project.cover_image_url}
+                          alt={project.title}
+                          className="w-full h-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-3 left-3">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#355746] text-white shadow-sm flex items-center gap-1">
+                            {project.project_url?.endsWith('.pdf') ? (
+                              <>
+                                <FileText className="w-3 h-3 text-[#D9C8AA]" />
+                                <span>PDF Document</span>
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-3 h-3 text-[#D9C8AA]" />
+                                <span>Infographic / Image</span>
+                              </>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content Info */}
+                      <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                        <div className="space-y-1.5">
+                          <h3 className="text-base font-bold text-[#243D32] group-hover:text-[#355746] transition-colors leading-snug">
+                            {project.title}
+                          </h3>
+                          <p className="text-xs text-[#746F64] line-clamp-2 leading-relaxed">
+                            {project.short_description}
+                          </p>
+                        </div>
+
+                        <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                          <span className="text-[11px] font-semibold text-[#80634D]">
+                            ดูรายละเอียดฉบับเต็ม
+                          </span>
+                          <div className="w-7 h-7 rounded-full bg-[#355746]/10 group-hover:bg-[#355746] text-[#355746] group-hover:text-white flex items-center justify-center transition-colors">
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 sm:px-8 py-4 border-t border-[#D9C8AA]/40 bg-white/70 flex items-center justify-between text-xs text-[#746F64]">
+              <span>💡 คลิกที่การ์ดเพื่อเปิดอ่านเอกสาร PDF หรือรูปภาพฉบับเต็ม</span>
+              <button
+                type="button"
+                onClick={() => setIsFolderModalOpen(false)}
+                className="px-5 py-2 rounded-full bg-[#355746] text-white font-bold hover:bg-[#243D32] transition-colors cursor-pointer"
+              >
+                ปิดหน้าต่าง
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

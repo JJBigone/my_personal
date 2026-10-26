@@ -20,16 +20,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, featured }) =
         featured ? 'md:col-span-2' : ''
       }`}
     >
-      <div className="relative aspect-video sm:aspect-16/10 overflow-hidden bg-[#D9C8AA]/30">
+      <div className="relative aspect-video sm:aspect-16/10 overflow-hidden bg-gradient-to-br from-[#FAF8F2] to-[#EAE4D7] flex items-center justify-center p-2">
         <motion.img
           layoutId={shouldReduceMotion ? undefined : `project-cover-${project.slug || project.id}`}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           src={project.cover_image_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800'}
           alt={project.title}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="w-full h-full object-contain drop-shadow-md transition-transform duration-700 ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#243D32]/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#243D32]/50 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />
 
         {/* Category tag */}
         <div className="absolute top-4 left-4">

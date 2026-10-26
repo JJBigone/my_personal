@@ -51,7 +51,7 @@ export const AboutPage: React.FC = () => {
     { label: 'อายุ', value: '19 ปี', sub: '19 เม.ย. 2550', icon: Calendar },
     { label: 'การศึกษา', value: 'ปวส. 1', sub: 'เทคโนโลยีสารสนเทศ', icon: GraduationCap },
     { label: 'รหัสนักศึกษา', value: '69319010009', sub: 'กลุ่ม 1', icon: ShieldCheck },
-    { label: 'สถาบัน', value: 'วิทยาลัยเทคนิค', sub: 'นครศรีธรรมราช', icon: School },
+    { label: 'สถาบัน', value: 'วิทยาลัยเทคนิคนครศรีธรรมราช', sub: '', icon: School },
   ];
 
   return (
@@ -104,12 +104,16 @@ export const AboutPage: React.FC = () => {
                     </span>
                     <Icon className="w-4 h-4 text-[#82977B] group-hover:text-[#355746] transition-colors" />
                   </div>
-                  <div className="text-base sm:text-lg font-black text-[#243D32] tracking-tight">
+                  <div className={`font-black text-[#243D32] tracking-tight leading-tight ${
+                    stat.value.length > 15 ? 'text-xs sm:text-sm' : 'text-base sm:text-lg'
+                  }`}>
                     {stat.value}
                   </div>
-                  <div className="text-[11px] text-[#82977B] font-medium truncate mt-0.5">
-                    {stat.sub}
-                  </div>
+                  {stat.sub && (
+                    <div className="text-[11px] text-[#82977B] font-medium truncate mt-0.5">
+                      {stat.sub}
+                    </div>
+                  )}
                 </div>
               );
             })}

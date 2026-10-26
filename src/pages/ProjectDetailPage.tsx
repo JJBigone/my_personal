@@ -129,17 +129,47 @@ export const ProjectDetailPage: React.FC = () => {
           </div>
         </StaggerItem>
 
-        {/* Cover Image with Shared Element Layout Transition */}
-        <StaggerItem>
-          <div className="aspect-video sm:aspect-16/9 rounded-3xl overflow-hidden glass-panel p-2 shadow-2xl bg-[#D9C8AA]/20">
-            <motion.img
-              layoutId={shouldReduceMotion ? undefined : `project-cover-${project.slug || project.id}`}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              src={project.cover_image_url}
-              alt={project.title}
-              className="w-full h-full object-cover rounded-2xl"
-            />
-          </div>
+        {/* Media / Document Preview: Full Image View or Embedded Multi-Page PDF Viewer */}
+        <StaggerItem className="space-y-6">
+          {project.project_url?.endsWith('.pdf') ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-2">
+                <span className="text-sm font-bold text-[#355746] flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#80634D] animate-pulse" />
+                  <span>เอกสาร PDF ฉบับเต็ม (เลื่อนดูได้ทุกหน้า)</span>
+                </span>
+                <a
+                  href={project.project_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-semibold text-[#80634D] hover:text-[#355746] flex items-center gap-1 underline"
+                >
+                  <span>เปิดเต็มจอในแท็บใหม่</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <div className="w-full h-[750px] sm:h-[900px] rounded-3xl overflow-hidden glass-panel border border-[#82977B]/40 shadow-2xl bg-white">
+                <iframe
+                  src={`${project.project_url}#toolbar=1&navpanes=1&scrollbar=1&view=FitH`}
+                  title={project.title}
+                  className="w-full h-full border-0"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="w-full rounded-3xl overflow-hidden glass-panel p-3 sm:p-5 shadow-2xl bg-gradient-to-br from-[#FAF8F2] via-white to-[#EAE4D7] border border-[#82977B]/30 flex flex-col items-center">
+              <motion.img
+                layoutId={shouldReduceMotion ? undefined : `project-cover-${project.slug || project.id}`}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                src={project.cover_image_url}
+                alt={project.title}
+                className="w-full max-h-[85vh] object-contain rounded-2xl drop-shadow-xl"
+              />
+              <span className="text-xs text-[#746F64] mt-3 font-medium">
+                แสดงผลรูปภาพเต็มขนาด ย่อ-ขยายตามขนาดหน้าจอโดยไม่ตัดขอบ
+              </span>
+            </div>
+          )}
         </StaggerItem>
 
         {/* Meta Specs Grid */}
