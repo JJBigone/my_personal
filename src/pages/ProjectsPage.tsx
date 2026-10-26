@@ -168,7 +168,7 @@ export const ProjectsPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#355746] animate-pulse" />
           <span className="text-xs font-bold uppercase tracking-wider text-[#243D32]">
-            {viewMode === 'folders' ? '3D Folders' : 'All Workshops'}
+            {viewMode === 'folders' ? 'โฟลเดอร์ 3D' : 'ชิ้นงานทั้งหมด'}
           </span>
         </div>
 
@@ -180,14 +180,14 @@ export const ProjectsPage: React.FC = () => {
               setActiveItemToast(null);
               handleViewModeChange('folders');
             }}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               viewMode === 'folders'
                 ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
                 : 'text-[#4B382D] hover:text-[#243D32]'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>Interactive Folders</span>
+            <span>โฟลเดอร์ 3D</span>
           </button>
           <button
             type="button"
@@ -195,14 +195,14 @@ export const ProjectsPage: React.FC = () => {
               setActiveItemToast(null);
               handleViewModeChange('grid');
             }}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               viewMode === 'grid'
                 ? 'bg-[#355746] text-[#FAF8F2] shadow-sm'
                 : 'text-[#4B382D] hover:text-[#243D32]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Grid View</span>
+            <span>มุมมองตาราง (Grid)</span>
           </button>
         </div>
       </div>
@@ -288,10 +288,14 @@ export const ProjectsPage: React.FC = () => {
                 size={1.25}
                 draggable={false}
                 items={unit1Items}
-                onItemClick={() => {
-                  setSelectedCategory('All');
-                  setSearchQuery('');
-                  handleViewModeChange('grid');
+                onItemClick={(item) => {
+                  if (item && typeof item === 'object' && 'href' in item && item.href) {
+                    navigate(item.href);
+                  } else {
+                    setSelectedCategory('All');
+                    setSearchQuery('');
+                    handleViewModeChange('grid');
+                  }
                 }}
               />
               <div className="mt-8 text-center max-w-[340px] space-y-3">

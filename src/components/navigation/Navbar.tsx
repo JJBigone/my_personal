@@ -66,7 +66,7 @@ export const Navbar: React.FC = () => {
             scrolled && "shadow-lg"
           )}
         >
-          Get in Touch
+          ติดต่อ
         </Link>
       </div>
     </header>
