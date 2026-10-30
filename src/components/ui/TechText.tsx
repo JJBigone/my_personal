@@ -1,4 +1,5 @@
 import { useEffect, useRef, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import './TechText.css';
 
 const LABEL_FONT = '10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -61,6 +62,7 @@ export interface TechTextProps {
   margin?: number;
   className?: string;
   style?: CSSProperties;
+  overflowViewport?: boolean;
 }
 
 export const TechText = ({
@@ -92,7 +94,8 @@ export const TechText = ({
   guides = false,
   margin: customMargin,
   className = '',
-  style
+  style,
+  overflowViewport = false
 }: TechTextProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -143,6 +146,8 @@ export const TechText = ({
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
     let width = 1;
     let height = 1;
+    let originX = 0;
+    let originY = 0;
     let dpr = 1;
     let raf = 0;
     let last = performance.now();
@@ -341,10 +346,11 @@ export const TechText = ({
     };
 
     const glyphAt = (x: number, y: number) => {
-      if (!word || y < word.top - 24 || y > word.bottom + 24) return -1;
+      if (!word) return -1;
       let best = -1;
       let bestDistance = Infinity;
       glyphs.forEach((glyph, i) => {
+        if (y < glyph.box.y1 + glyph.offset.y - 24 || y > glyph.box.y2 + glyph.offset.y + 24) return;
         const x1 = glyph.box.x1 + glyph.offset.x;
         const x2 = glyph.box.x2 + glyph.offset.x;
         const d = x < x1 ? x1 - x : x > x2 ? x - x2 : 0;
@@ -484,7 +490,7 @@ export const TechText = ({
       const y1 = crisp(frame.y1);
       const x2 = crisp(frame.x2);
       const y2 = crisp(frame.y2);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.setTransform(dpr, 0, 0, dpr, originX, originY);
       ctx.fillStyle = accent;
       ctx.strokeStyle = accent;
       ctx.lineWidth = 1;
@@ -545,7 +551,7 @@ export const TechText = ({
       const x1 = Math.round(view.left - pad);
       const x2 = Math.round(view.right + pad);
       const room = width - x2 > x1;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.setTransform(dpr, 0, 0, dpr, originX, originY);
       ctx.strokeStyle = accent;
       ctx.fillStyle = accent;
       ctx.lineWidth = 1;
@@ -571,7 +577,7 @@ export const TechText = ({
         }
       });
       ctx.textAlign = 'left';
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.setTransform(1, 0, 0, 1, originX, originY);
       ctx.globalAlpha = 1;
     };
 
@@ -847,6 +853,12 @@ export const TechText = ({
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (overflowViewport) {
+        const bounds = container.getBoundingClientRect();
+        originX = bounds.left * dpr;
+        originY = bounds.top * dpr;
+      }
+      ctx.setTransform(1, 0, 0, 1, originX, originY);
       for (const glyph of glyphs) {
         const moved = Math.hypot(glyph.offset.x, glyph.offset.y);
         if (moved > 1) {
@@ -912,8 +924,8 @@ export const TechText = ({
       width = Math.max(1, container.clientWidth);
       height = Math.max(1, container.clientHeight);
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+      canvas.width = Math.round((overflowViewport ? window.innerWidth : width) * dpr);
+      canvas.height = Math.round((overflowViewport ? window.innerHeight : height) * dpr);
       layoutKey = '';
       wake();
     };
@@ -982,8 +994,16 @@ export const TechText = ({
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
+    window.addEventListener('scroll', wake, { passive: true });
+    window.addEventListener('resize', resize);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (!visible && overflowViewport) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
       wake();
     });
     intersectionObserver.observe(container);
@@ -1002,6 +1022,8 @@ export const TechText = ({
       cancelAnimationFrame(raf);
       wakeRef.current = () => {};
       resizeObserver.disconnect();
+      window.removeEventListener('scroll', wake);
+      window.removeEventListener('resize', resize);
       intersectionObserver.disconnect();
       themeObserver.disconnect();
       schemeQuery?.removeEventListener?.('change', wake);
@@ -1013,11 +1035,14 @@ export const TechText = ({
       container.removeEventListener('pointercancel', onUp);
       container.removeEventListener('pointerleave', onLeave);
     };
-  }, []);
+  }, [overflowViewport]);
 
   return (
     <div ref={containerRef} className={`tech-text ${className}`.trim()} style={style} role="img" aria-label={text}>
-      <canvas ref={canvasRef} className="tech-text-canvas" />
+      {overflowViewport ? createPortal(
+        <canvas ref={canvasRef} className="tech-text-viewport-canvas" aria-hidden="true" />,
+        document.body
+      ) : <canvas ref={canvasRef} className="tech-text-canvas" />}
     </div>
   );
 };

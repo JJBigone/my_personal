@@ -113,7 +113,7 @@ export const AboutPage: React.FC = () => {
                           เทคโนโลยีสารสนเทศ
                         </span>
                         <h3 className="text-base font-bold text-white drop-shadow-md">
-                          พชรภูมิ มฤค (เจเดม)
+                          พชรภูมิ มฤค (เจแดม)
                         </h3>
                         <p className="text-[11px] text-[#D9C8AA] mt-0.5">
                           วิทยาลัยเทคนิคนครศรีธรรมราช
@@ -169,7 +169,7 @@ export const AboutPage: React.FC = () => {
                 <div className="p-3.5 rounded-2xl bg-[#FAF9F5] border border-[#82977B]/20 space-y-0.5">
                   <span className="text-[11px] text-[#746F64] block">ชื่อ-สกุล / ชื่อเล่น</span>
                   <p className="text-sm font-bold text-[#243D32]">
-                    นาย พชรภูมิ มฤค <span className="text-[#355746] font-extrabold">(เจเดม)</span>
+                    นาย พชรภูมิ มฤค <span className="text-[#355746] font-extrabold">(เจแดม)</span>
                   </p>
                 </div>
 

@@ -13,6 +13,7 @@ const HERO_VALUES: Hero12Props = {
   titleNode: (
     <div className="w-full max-w-4xl h-[60px] sm:h-[80px] md:h-[105px] lg:h-[125px] relative select-none">
       <TechText
+        overflowViewport
         text="Pacharaphum Maruek"
         fontWeight={800}
         fontSize={160}
